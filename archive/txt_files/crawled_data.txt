@@ -1,0 +1,10 @@
+{
+  "crawled_data": {
+    "insight_count": 5,
+    "processed_count": 0,
+    "source_count": 14,
+    "topic_count": 5
+  },
+  "message": "Error during crawling: __init__() got an unexpected keyword argument 'max_pages_per_domain'. Using fallback data.",
+  "status": "warning"
+}

@@ -1,0 +1,397 @@
+{% extends "onboarding/base_step.html" %}
+
+{% set prev_step_url = "/onboarding/step1" %}
+{% set next_step_url = "/onboarding/step3" %}
+
+{% block step_title %}Writing Style{% endblock %}
+{% block step_number %}2{% endblock %}
+{% block step_heading %}Writing Style Analysis{% endblock %}
+
+{% block step_styles %}
+<style>
+.tone-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.tone-card {
+  background-color: #2a2a2a;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tone-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.tone-card.selected {
+  border: 2px solid var(--accent-color);
+  background-color: rgba(196, 164, 132, 0.1);
+}
+
+.tone-card h3 {
+  margin-top: 0;
+  color: var(--accent-color);
+}
+
+.tone-card p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.tone-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: var(--accent-color);
+}
+
+.analysis-container {
+  margin-top: 30px;
+  background-color: #2a2a2a;
+  border-radius: 5px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.analysis-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.analysis-heading h3 {
+  margin: 0;
+  color: var(--accent-color);
+}
+
+.analysis-status {
+  font-size: 0.9rem;
+  color: var(--info-color);
+}
+
+.analysis-content {
+  background-color: #333;
+  border-radius: 5px;
+  padding: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+}
+
+.trait-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.trait-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  background-color: #333;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+.trait-value {
+  flex-grow: 1;
+  height: 8px;
+  background-color: #444;
+  border-radius: 4px;
+  margin: 0 15px;
+  position: relative;
+}
+
+.trait-value .fill {
+  position: absolute;
+  height: 100%;
+  background-color: var(--accent-color);
+  border-radius: 4px;
+  left: 0;
+  top: 0;
+}
+
+.trait-percent {
+  width: 40px;
+  text-align: right;
+  font-weight: bold;
+}
+</style>
+{% endblock %}
+
+{% block step_content %}
+<p>
+  Based on your content sources, we'll analyze the writing style and tone to ensure 
+  your generated content matches your brand voice.
+</p>
+
+<div class="tone-cards">
+  <div class="tone-card" onclick="selectTone('professional')">
+    <div class="tone-icon"><i class="fas fa-briefcase"></i></div>
+    <h3>Professional</h3>
+    <p>Formal, authoritative, and business-oriented tone suitable for corporate content.</p>
+  </div>
+  
+  <div class="tone-card" onclick="selectTone('conversational')">
+    <div class="tone-icon"><i class="fas fa-comments"></i></div>
+    <h3>Conversational</h3>
+    <p>Friendly, approachable, and engaging tone that feels like a natural conversation.</p>
+  </div>
+  
+  <div class="tone-card" onclick="selectTone('educational')">
+    <div class="tone-icon"><i class="fas fa-graduation-cap"></i></div>
+    <h3>Educational</h3>
+    <p>Informative, explanatory, and instructive tone focused on teaching concepts.</p>
+  </div>
+  
+  <div class="tone-card" onclick="selectTone('entertaining')">
+    <div class="tone-icon"><i class="fas fa-smile"></i></div>
+    <h3>Entertaining</h3>
+    <p>Lively, humorous, and engaging tone designed to entertain and captivate.</p>
+  </div>
+  
+  <div class="tone-card" onclick="selectTone('persuasive')">
+    <div class="tone-icon"><i class="fas fa-bullhorn"></i></div>
+    <h3>Persuasive</h3>
+    <p>Convincing, motivational, and compelling tone aimed at influencing decisions.</p>
+  </div>
+  
+  <div class="tone-card" onclick="selectTone('informative')">
+    <div class="tone-icon"><i class="fas fa-info-circle"></i></div>
+    <h3>Informative</h3>
+    <p>Factual, objective, and straightforward tone focused on delivering information.</p>
+  </div>
+</div>
+
+<div class="analysis-container" id="analysisContainer" style="display: none;">
+  <div class="analysis-heading">
+    <h3>Writing Style Analysis</h3>
+    <div class="analysis-status" id="analysisStatus">Analyzing...</div>
+  </div>
+  
+  <div class="analysis-content" id="analysisContent">
+    <p>Analyzing your content sources to identify your unique writing style...</p>
+  </div>
+  
+  <h3 style="margin-top: 20px;">Style Traits</h3>
+  
+  <ul class="trait-list" id="traitList">
+    <!-- Traits will be added here dynamically -->
+  </ul>
+</div>
+{% endblock %}
+
+{% block navigation_buttons %}
+<button class="btn-secondary" onclick="previousStep()">Back</button>
+<button class="btn-primary" onclick="validateAndContinue()">Continue</button>
+{% endblock %}
+
+{% block step_scripts %}
+<script>
+let selectedTone = null;
+const traits = {
+  formality: 0,
+  technicality: 0,
+  creativity: 0,
+  persuasiveness: 0,
+  detail: 0,
+  engagement: 0
+};
+
+// Custom next function to validate before proceeding
+function validateAndContinue() {
+  if (!selectedTone) {
+    alert('Please select a tone before continuing.');
+    return;
+  }
+  saveStylePreferences();
+  nextStep();
+}
+
+function selectTone(tone) {
+  selectedTone = tone;
+  
+  // Remove selected class from all cards
+  document.querySelectorAll('.tone-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  
+  // Add selected class to clicked card
+  const selectedCard = document.querySelector(`.tone-card:nth-child(${getToneIndex(tone)})`);
+  if (selectedCard) {
+    selectedCard.classList.add('selected');
+  }
+  
+  // Show analysis container
+  document.getElementById('analysisContainer').style.display = 'block';
+  
+  // Start analysis
+  performAnalysis(tone);
+}
+
+function getToneIndex(tone) {
+  const tones = ['professional', 'conversational', 'educational', 'entertaining', 'persuasive', 'informative'];
+  return tones.indexOf(tone) + 1;
+}
+
+function performAnalysis(tone) {
+  // Set status to analyzing
+  document.getElementById('analysisStatus').textContent = 'Analyzing...';
+  
+  // Simulate analysis
+  setTimeout(() => {
+    // Update analysis content based on tone
+    let analysisContent = '';
+    
+    switch(tone) {
+      case 'professional':
+        analysisContent = 'Your content sources demonstrate a formal, precise tone with industry-specific terminology. Sentences are structured clearly and logically. Content is factual and objective with minimal personal opinions.';
+        traits.formality = 85;
+        traits.technicality = 75;
+        traits.creativity = 30;
+        traits.persuasiveness = 60;
+        traits.detail = 70;
+        traits.engagement = 50;
+        break;
+      case 'conversational':
+        analysisContent = 'Your content sources use a relaxed, approachable style with personal pronouns (I, we, you) and contractions. Questions are used to engage readers. The writing feels like a dialogue rather than a lecture.';
+        traits.formality = 30;
+        traits.technicality = 40;
+        traits.creativity = 65;
+        traits.persuasiveness = 70;
+        traits.detail = 55;
+        traits.engagement = 85;
+        break;
+      case 'educational':
+        analysisContent = 'Your content sources prioritize clarity with well-defined concepts. Complex ideas are broken down into digestible segments. Examples and analogies are used to illustrate points. Content flows in a logical, structured progression.';
+        traits.formality = 60;
+        traits.technicality = 70;
+        traits.creativity = 50;
+        traits.persuasiveness = 60;
+        traits.detail = 80;
+        traits.engagement = 70;
+        break;
+      case 'entertaining':
+        analysisContent = 'Your content sources employ a vibrant, colorful vocabulary with creative expressions. Humor and wit are evident throughout. Storytelling techniques maintain reader interest. Content has an energetic, dynamic pace.';
+        traits.formality = 20;
+        traits.technicality = 30;
+        traits.creativity = 90;
+        traits.persuasiveness = 60;
+        traits.detail = 50;
+        traits.engagement = 90;
+        break;
+      case 'persuasive':
+        analysisContent = 'Your content sources use strong, compelling language with rhetorical techniques. Benefits and value propositions are emphasized. Content addresses potential objections proactively. Calls to action guide readers toward specific conclusions.';
+        traits.formality = 60;
+        traits.technicality = 50;
+        traits.creativity = 65;
+        traits.persuasiveness = 90;
+        traits.detail = 70;
+        traits.engagement = 80;
+        break;
+      case 'informative':
+        analysisContent = 'Your content sources present information objectively with minimal bias. Data and statistics support key points. Content is comprehensive and thorough. Organization prioritizes clarity and information accessibility.';
+        traits.formality = 70;
+        traits.technicality = 65;
+        traits.creativity = 40;
+        traits.persuasiveness = 50;
+        traits.detail = 85;
+        traits.engagement = 60;
+        break;
+    }
+    
+    document.getElementById('analysisContent').textContent = analysisContent;
+    document.getElementById('analysisStatus').textContent = 'Analysis Complete';
+    
+    // Update trait list
+    updateTraitList();
+  }, 1500);
+}
+
+function updateTraitList() {
+  const traitList = document.getElementById('traitList');
+  traitList.innerHTML = '';
+  
+  // Convert traits object to array for easier iteration
+  const traitEntries = Object.entries(traits);
+  
+  // Create trait items
+  traitEntries.forEach(([trait, value]) => {
+    const li = document.createElement('li');
+    li.className = 'trait-item';
+    
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'trait-name';
+    nameSpan.textContent = formatTraitName(trait);
+    
+    const valueDiv = document.createElement('div');
+    valueDiv.className = 'trait-value';
+    
+    const fillDiv = document.createElement('div');
+    fillDiv.className = 'fill';
+    fillDiv.style.width = `${value}%`;
+    
+    const percentSpan = document.createElement('span');
+    percentSpan.className = 'trait-percent';
+    percentSpan.textContent = `${value}%`;
+    
+    valueDiv.appendChild(fillDiv);
+    li.appendChild(nameSpan);
+    li.appendChild(valueDiv);
+    li.appendChild(percentSpan);
+    
+    traitList.appendChild(li);
+  });
+}
+
+function formatTraitName(trait) {
+  return trait.charAt(0).toUpperCase() + trait.slice(1);
+}
+
+function saveStylePreferences() {
+  // Save selected tone and traits to server
+  fetch('/api/save-style', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      tone: selectedTone,
+      traits: traits
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (!data.success) {
+      console.error('Error saving style preferences:', data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error saving style preferences:', error);
+  });
+}
+
+// Load saved style preferences if available
+function loadStylePreferences() {
+  fetch('/api/get-style')
+  .then(response => response.json())
+  .then(data => {
+    if (data.success && data.tone) {
+      selectTone(data.tone);
+    }
+  })
+  .catch(error => {
+    console.error('Error loading style preferences:', error);
+  });
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', loadStylePreferences);
+</script>
+{% endblock %}

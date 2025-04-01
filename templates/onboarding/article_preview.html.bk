@@ -1,0 +1,414 @@
+{% extends "articles/article_preview.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SocialMe - Article Preview</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .preview-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .article-card {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 30px;
+      margin: 20px 0;
+    }
+
+    .article-title {
+      font-size: 1.5em;
+      margin: 0 0 20px 0;
+      color: #ffffff;
+    }
+
+    .article-content {
+      color: #e0e0e0;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .article-content p {
+      margin: 15px 0;
+    }
+
+    .article-content ul,
+    .article-content ol {
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+
+    .article-content li {
+      margin: 8px 0;
+    }
+
+    .summary-section {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    .summary-section h3 {
+      margin-top: 0;
+      color: #ffffff;
+    }
+
+    .summary-item {
+      margin: 15px 0;
+    }
+
+    .summary-item h4 {
+      margin: 0 0 5px 0;
+      color: #5c6bc0;
+    }
+
+    .summary-item p {
+      margin: 0;
+      font-size: 0.9em;
+      line-height: 1.5;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    .step-indicator::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: #333;
+      z-index: 1;
+    }
+    .step {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #333;
+      color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+    .step.active {
+      background-color: #5c6bc0;
+    }
+    .step.completed {
+      background-color: #4caf50;
+    }
+    .step-label {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .loading-indicator {
+      text-align: center;
+      padding: 20px;
+      color: #e0e0e0;
+      display: none;
+    }
+
+    .loading-indicator.visible {
+      display: block;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #5c6bc0;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .feedback-buttons {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .feedback-button {
+      background: #2d2d2d;
+      color: #e0e0e0;
+      border: 1px solid #333;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .feedback-button:hover {
+      background: #3d3d3d;
+    }
+
+    .feedback-button.active {
+      background: #5c6bc0;
+      color: #ffffff;
+      border-color: #5c6bc0;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+    <div class="step-indicator">
+      <div class="step completed">
+        1
+        <span class="step-label">Content Sources</span>
+      </div>
+      <div class="step completed">
+        2
+        <span class="step-label">Writing Style</span>
+      </div>
+      <div class="step completed">
+        3
+        <span class="step-label">Article Generation</span>
+      </div>
+      <div class="step active">
+        4
+        <span class="step-label">Preview & Export</span>
+      </div>
+    </div>
+
+    <h1>Article Preview</h1>
+
+    <div class="loading-indicator" id="loadingIndicator">
+      <div class="spinner"></div>
+      Loading your article...
+    </div>
+
+    <div class="article-card">
+      <h2 class="article-title" id="articleTitle">Loading article title...</h2>
+      <h5 class="text-muted mb-4" id="articleSubtitle">Loading subtitle...</h5>
+      
+      <div class="article-content" id="articleContent">
+        <p>Loading article content...</p>
+      </div>
+
+      <div class="feedback-buttons">
+        <button class="feedback-button" onclick="toggleFeedback(this, 'like')">
+          <i class="fas fa-thumbs-up"></i> Like
+        </button>
+        <button class="feedback-button" onclick="toggleFeedback(this, 'dislike')">
+          <i class="fas fa-thumbs-down"></i> Dislike
+        </button>
+      </div>
+    </div>
+
+    <div class="summary-section">
+      <h3>Article Summary</h3>
+      
+      <div class="summary-item">
+        <h4>Word Count</h4>
+        <p id="wordCount">Calculating...</p>
+      </div>
+      
+      <div class="summary-item">
+        <h4>Reading Time</h4>
+        <p id="readingTime">Calculating...</p>
+      </div>
+      
+      <div class="summary-item">
+        <h4>Sources Used</h4>
+        <p id="sourcesCount">Calculating...</p>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn btn-outline-light" onclick="window.location.href='/onboarding/advanced-article-generator'">
+        <i class="fas fa-arrow-left"></i> Back to Generator
+      </button>
+      <button class="btn btn-outline-light" onclick="regenerateArticle()">
+        <i class="fas fa-redo"></i> Regenerate
+      </button>
+      <button class="btn btn-primary" onclick="approveArticle()">
+        <i class="fas fa-check"></i> Approve & Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Server data for JavaScript -->
+  <script id="server-data" type="application/json">
+    {% if article_data %}{{ article_data|safe }}{% else %}null{% endif %}
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get article data from the embedded JSON
+      let articleData = null;
+      
+      // Safely parse the server-provided data
+      try {
+        const dataElement = document.getElementById('server-data');
+        const serverArticleData = JSON.parse(dataElement.textContent);
+        
+        if (serverArticleData) {
+          console.log('Retrieved article data from server:', serverArticleData);
+          articleData = serverArticleData;
+          displayArticle(articleData);
+        } else {
+          // Fall back to session storage if server didn't provide data
+          const storedArticle = sessionStorage.getItem('generatedArticle');
+          if (storedArticle) {
+            articleData = JSON.parse(storedArticle);
+            console.log('Retrieved article data from session storage:', articleData);
+            displayArticle(articleData);
+          } else {
+            console.error('No article data found from server or session storage');
+            // Redirect back to step 4 if no article data is available
+            window.location.href = '/step4';
+          }
+        }
+      } catch (e) {
+        console.error('Error retrieving article data:', e);
+        // Redirect back to step 4 on error
+        window.location.href = '/step4';
+      }
+
+    function toggleFeedback(button, type) {
+      button.classList.toggle('active');
+      // In a real application, this would send feedback to the server
+      console.log(`Feedback toggled: ${type}`);
+    }
+
+    function regenerateArticle() {
+      // In a real implementation, this would request a new article
+      alert('Requesting article regeneration...');
+      
+      // Navigate back to generator page
+      window.location.href = '/onboarding/advanced-article-generator';
+    }
+
+    function approveArticle() {
+      // In a real implementation, this would save the approved article
+      alert('Article approved. Redirecting to login to save and schedule your content...');
+      window.location.href = '/login';
+    }
+
+    function displayArticle(article) {
+      const titleElement = document.getElementById('articleTitle');
+      const subtitleElement = document.getElementById('articleSubtitle');
+      const contentElement = document.getElementById('articleContent');
+      const wordCountElement = document.getElementById('wordCount');
+      const readingTimeElement = document.getElementById('readingTime');
+      const sourcesCountElement = document.getElementById('sourcesCount');
+      
+      // Set article title and subtitle
+      titleElement.textContent = article.title || 'No Title Available';
+      
+      if (article.subtitle) {
+        subtitleElement.textContent = article.subtitle;
+        subtitleElement.classList.remove('d-none');
+      } else {
+        subtitleElement.classList.add('d-none');
+      }
+      
+      // Clear any loading indicators
+      contentElement.innerHTML = '';
+      
+      // Build the article content
+      let html = '';
+      
+      // Add introduction
+      if (article.introduction) {
+        html += `<div class="article-section mb-4">
+          <p class="lead">${article.introduction}</p>
+        </div>`;
+      }
+      
+      // Add body sections
+      if (article.body && Array.isArray(article.body)) {
+        article.body.forEach(section => {
+          html += `<div class="article-section mb-4">
+            <h3 class="mb-3">${section.subheading || section.heading || 'Section'}</h3>
+            <p>${section.content}</p>
+          </div>`;
+        });
+      }
+      
+      // Add conclusion
+      if (article.conclusion) {
+        html += `<div class="article-section mb-4">
+          <h3 class="mb-3">Conclusion</h3>
+          <p>${article.conclusion}</p>
+        </div>`;
+      }
+      
+      // Add sources if available
+      if (article.sources && Array.isArray(article.sources) && article.sources.length > 0) {
+        html += `<div class="sources-section mt-5">
+          <h4>Sources</h4>
+          <ul>`;
+        
+        article.sources.forEach(source => {
+          if (typeof source === 'string') {
+            html += `<li>${source}</li>`;
+          } else if (source.name || source.url) {
+            html += `<li>${source.name || 'Unnamed Source'}${source.url ? ` - <a href="${source.url}" target="_blank">${source.url}</a>` : ''}</li>`;
+          }
+        });
+        
+        html += `</ul></div>`;
+      }
+      
+      contentElement.innerHTML = html || '<p>No article content available. Please return to step 4 and generate an article.</p>';
+      
+      // Calculate word count
+      let wordCount = 0;
+      if (article.introduction) wordCount += article.introduction.split(/\s+/).length;
+      if (article.conclusion) wordCount += article.conclusion.split(/\s+/).length;
+      if (article.body && Array.isArray(article.body)) {
+        article.body.forEach(section => {
+          if (section.content) wordCount += section.content.split(/\s+/).length;
+        });
+      }
+      
+      // Update summary metrics
+      wordCountElement.textContent = `${wordCount} words`;
+      readingTimeElement.textContent = `${Math.ceil(wordCount / 225)} minutes`;
+      sourcesCountElement.textContent = article.sources ? `${article.sources.length} sources` : 'No sources';
+    }
+    });
+  </script>
+</body>
+</html>

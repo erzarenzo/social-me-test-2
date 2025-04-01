@@ -1,0 +1,307 @@
+{% extends "onboarding/base_step.html" %}
+
+{% set prev_step_url = "/onboarding/step3" %}
+{% set next_step_url = "/dashboard" %}
+
+{% block step_title %}Article Generation{% endblock %}
+{% block step_number %}4{% endblock %}
+{% block step_heading %}Article Generation{% endblock %}
+
+{% block step_styles %}
+<style>
+  /* Existing styles from the original template */
+  body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .preview-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .article-card {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 30px;
+    margin: 20px 0;
+  }
+  
+  .article-title {
+    font-size: 1.5em;
+    margin: 0 0 20px 0;
+    color: #ffffff;
+  }
+  
+  .article-content {
+    color: #e0e0e0;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+  
+  .article-content p {
+    margin: 15px 0;
+  }
+  
+  .article-content ul,
+  .article-content ol {
+    margin: 15px 0;
+    padding-left: 20px;
+  }
+  
+  .article-content li {
+    margin: 8px 0;
+  }
+  
+  .summary-section {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 30px;
+  }
+  
+  .summary-section h3 {
+    margin-top: 0;
+    color: #ffffff;
+  }
+  
+  .summary-item {
+    margin: 15px 0;
+  }
+  
+  .summary-item h4 {
+    margin: 0 0 5px 0;
+    color: #5c6bc0;
+  }
+  
+  .summary-item p {
+    margin: 0;
+    font-size: 0.9em;
+    line-height: 1.5;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+  }
+  
+  .step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  .step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #333;
+    z-index: 1;
+  }
+  .step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #333;
+    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+  }
+  .step.active {
+    background-color: #5c6bc0;
+  }
+  .step.completed {
+    background-color: #4caf50;
+  }
+  .step-label {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12px;
+  }
+  
+  .loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: #e0e0e0;
+    display: none;
+  }
+  
+  .loading-indicator.visible {
+    display: block;
+  }
+  
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #5c6bc0;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .feedback-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .feedback-button {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .feedback-button:hover {
+    background: #3d3d3d;
+  }
+  
+  .feedback-button.active {
+    background: #5c6bc0;
+    color: #ffffff;
+    border-color: #5c6bc0;
+  }
+</style>
+{% endblock %}
+
+{% block step_content %}
+<div class="step-indicator">
+  <div class="step completed">
+    1
+    <span class="step-label">Content Sources</span>
+  </div>
+  <div class="step completed">
+    2
+    <span class="step-label">Writing Style</span>
+  </div>
+  <div class="step completed">
+    3
+    <span class="step-label">Content Strategy</span>
+  </div>
+  <div class="step active">
+    4
+    <span class="step-label">Article Generation</span>
+  </div>
+</div>
+
+<h1>Article Generation</h1>
+
+<div class="alert alert-info">
+  <p><strong>Ready to create your article?</strong></p>
+  <p>We'll use your content sources, writing style analysis, and content strategy to generate a 4000-word article.</p>
+</div>
+
+<div class="article-card">
+  <h2 class="article-title">Generate Your Article</h2>
+  
+  <div>
+    <p>This step combines all the data you've provided to create a complete 4000-word article:</p>
+    <ul>
+      <li>Content sources: {{ data_sources|length }} sources added</li>
+      <li>Writing style: {{ "Analyzed" if tone_analysis else "Not analyzed" }}</li>
+      <li>Content strategy: {{ "Added" if content_strategy else "Not added" }}</li>
+    </ul>
+    
+    <p>The generation process may take 1-2 minutes to complete. Once finished, you'll be able to preview, edit, and export your article.</p>
+    
+    <div class="loading-indicator" id="loadingIndicator">
+      <div class="spinner"></div>
+      Generating your article... This may take 1-2 minutes.
+    </div>
+    
+    <div class="action-buttons">
+      <button class="btn btn-outline-light" onclick="window.location.href='/step3'">
+        <i class="fas fa-arrow-left"></i> Back to Content Strategy
+      </button>
+      <button class="btn btn-primary" id="generateBtn" onclick="generateArticle()">
+        <i class="fas fa-magic"></i> Generate Article
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block navigation_buttons %}
+<button class="btn-secondary" onclick="previousStep()">Back</button>
+<button class="btn-primary" id="generateBtn" onclick="generateArticle()">Generate Article</button>
+<button class="btn-primary" id="completeBtn" style="display: none;" onclick="completeOnboarding()">Complete & Go to Dashboard</button>
+{% endblock %}
+
+{% block step_scripts %}
+<script>
+function generateArticle() {
+  // Show loading indicator
+  document.getElementById('loadingIndicator').classList.add('visible');
+  document.getElementById('generateBtn').disabled = true;
+  
+  // Send request to generate-article endpoint
+  fetch('/generate-article', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      console.log('Article generated successfully');
+      
+      // If there's a redirect script, execute it
+      if (data.redirect_script) {
+        // Create a script element to execute the redirect script
+        const scriptElement = document.createElement('script');
+        scriptElement.innerHTML = data.redirect_script;
+        document.body.appendChild(scriptElement);
+      } else {
+        // Otherwise, redirect manually
+        window.location.href = '/article-preview';
+      }
+    } else {
+      // Handle error
+      alert('Error generating article: ' + (data.message || 'Unknown error'));
+      document.getElementById('loadingIndicator').classList.remove('visible');
+      document.getElementById('generateBtn').disabled = false;
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error generating article. Please try again.');
+    document.getElementById('loadingIndicator').classList.remove('visible');
+    document.getElementById('generateBtn').disabled = false;
+  });
+}
+
+function completeOnboarding() {
+  // Navigate to the dashboard
+  window.location.href = "{{ next_step_url }}";
+}
+</script>
+{% endblock %}

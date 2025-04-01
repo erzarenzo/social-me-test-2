@@ -1,0 +1,375 @@
+{% extends "onboarding/base_step.html" %}
+
+{% block title %}SocialMe - Writing Style Analysis{% endblock %}
+
+{% block step_styles %}
+<style>
+    :root {
+        --background-color: #ffffff;
+        --text-color: #333333;
+        --accent-color: #4a86e8;
+        --border-color: #e0e0e0;
+        --card-background: #f5f5f5;
+        --button-background: #f0f0f0;
+        --button-hover: #e0e0e0;
+        --analysis-background: #f9f9f9;
+        --info-color: #4a86e8;
+        --info-color-hover: #3a76c8;
+    }
+
+    .input-methods {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .input-method {
+        flex: 1;
+        padding: 15px;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        margin-right: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .input-method:hover {
+        border-color: var(--accent-color);
+        background-color: rgba(74, 134, 232, 0.05);
+    }
+
+    .input-method.active {
+        border-color: var(--accent-color);
+        background-color: rgba(74, 134, 232, 0.1);
+        box-shadow: 0 2px 5px rgba(74, 134, 232, 0.2);
+    }
+
+    .input-method h3 {
+        margin-top: 0;
+        font-size: 1em;
+        color: var(--text-color);
+    }
+
+    .input-method p {
+        font-size: 0.8em;
+        color: #666;
+    }
+
+    .input-content {
+        display: none;
+        margin-top: 20px;
+    }
+
+    .input-content.active {
+        display: block;
+    }
+
+    textarea, input[type="url"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        font-family: inherit;
+        transition: border-color 0.3s ease;
+    }
+
+    textarea:focus, input[type="url"]:focus {
+        outline: none;
+        border-color: var(--accent-color);
+    }
+
+    .file-upload {
+        border: 2px dashed var(--border-color);
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .file-upload:hover {
+        border-color: var(--accent-color);
+        background-color: rgba(74, 134, 232, 0.05);
+    }
+
+    .upload-icon {
+        font-size: 2em;
+        color: var(--accent-color);
+        margin-bottom: 10px;
+    }
+
+    .analyze-button {
+        background: var(--info-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        margin-top: 15px;
+        transition: background 0.3s ease;
+    }
+
+    .analyze-button:hover {
+        background: var(--info-color-hover);
+    }
+
+    .analysis-results {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: var(--analysis-background);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+
+    .analysis-section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .analysis-section:last-child {
+        border-bottom: none;
+    }
+
+    .section-title {
+        font-weight: bold;
+        color: var(--accent-color);
+        margin-bottom: 8px;
+    }
+
+    .section-content {
+        font-size: 0.95em;
+    }
+
+    .recommendations {
+        list-style-type: none;
+        padding-left: 0;
+    }
+</style>
+{% endblock %}
+
+{% block step_content %}
+<div class="container">
+    <div class="step-indicator">Step 2 of 4</div>
+    
+    <h1>Writing Style Analysis</h1>
+    
+    <div class="info-box">
+        <p>Help us understand your unique writing style by providing sample content. This will help generate articles that match your voice and tone.</p>
+    </div>
+
+    <div class="input-methods">
+        <div class="input-method" data-method="text" onclick="selectInputMethod('text')">
+            <h3>Text Input</h3>
+            <p>Paste a sample of your writing</p>
+        </div>
+        <div class="input-method" data-method="url" onclick="selectInputMethod('url')">
+            <h3>URL Input</h3>
+            <p>Share a link to an article</p>
+        </div>
+        <div class="input-method" data-method="upload" onclick="selectInputMethod('upload')">
+            <h3>File Upload</h3>
+            <p>Upload a document</p>
+        </div>
+    </div>
+
+    <div id="textInput" class="input-content">
+        <textarea id="writingSampleText" placeholder="Paste your writing sample here..."></textarea>
+    </div>
+
+    <div id="urlInput" class="input-content">
+        <input type="url" id="writingSampleUrl" placeholder="https://example.com/article">
+    </div>
+
+    <div id="uploadInput" class="input-content">
+        <div class="file-upload">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <p>Drag and drop a file or click to upload</p>
+            <input type="file" id="writingSampleFile" style="display:none;" accept=".txt,.doc,.docx,.pdf">
+        </div>
+    </div>
+
+    <button class="analyze-button" onclick="analyzeWritingStyle()">Analyze Writing Style</button>
+
+    <div id="analysisResults" class="analysis-results" style="display:none;">
+        <div class="analysis-section">
+            <div class="section-title">Tone and Voice</div>
+            <div class="section-content" id="toneAnalysis">
+                <!-- Tone analysis results will be populated here -->
+            </div>
+        </div>
+        <div class="analysis-section">
+            <div class="section-title">Complexity and Readability</div>
+            <div class="section-content" id="readabilityAnalysis">
+                <!-- Readability analysis results will be populated here -->
+            </div>
+        </div>
+        <div class="analysis-section">
+            <div class="section-title">Recommendations</div>
+            <div class="section-content">
+                <ul class="recommendations" id="styleRecommendations">
+                    <!-- Style recommendations will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="button-row">
+        <button class="nav-button" onclick="previousStep()">Back</button>
+        <button class="nav-button" onclick="nextStep()" disabled id="continueButton">Next</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block step_scripts %}
+<script>
+let writingStyleData = null;
+
+function selectInputMethod(method) {
+    // Reset all input methods
+    document.querySelectorAll('.input-method').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    // Hide all input contents
+    document.querySelectorAll('.input-content').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    // Activate selected method
+    const selectedMethod = document.querySelector(`.input-method[data-method="${method}"]`);
+    const selectedContent = document.getElementById(`${method}Input`);
+    
+    selectedMethod.classList.add('active');
+    selectedContent.classList.add('active');
+}
+
+function analyzeWritingStyle() {
+    const analysisResults = document.getElementById('analysisResults');
+    const continueButton = document.getElementById('continueButton');
+    
+    // Reset previous analysis
+    analysisResults.style.display = 'none';
+    continueButton.disabled = true;
+
+    // Determine input method
+    const activeMethod = document.querySelector('.input-method.active').dataset.method;
+    let inputData = '';
+
+    switch(activeMethod) {
+        case 'text':
+            inputData = document.getElementById('writingSampleText').value;
+            break;
+        case 'url':
+            inputData = document.getElementById('writingSampleUrl').value;
+            break;
+        case 'upload':
+            const fileInput = document.getElementById('writingSampleFile');
+            if (fileInput.files.length > 0) {
+                // In a real implementation, you'd use FileReader or FormData
+                inputData = fileInput.files[0].name;
+            }
+            break;
+    }
+
+    // Validate input
+    if (!inputData.trim()) {
+        alert('Please provide a writing sample');
+        return;
+    }
+
+    // Simulate writing style analysis
+    fetch('/analyze-writing-style', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            input: inputData,
+            method: activeMethod
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Store writing style data
+        writingStyleData = data;
+
+        // Update tone analysis
+        document.getElementById('toneAnalysis').innerHTML = `
+            <p><strong>Detected Tone:</strong> ${data.tone || 'Professional and Informative'}</p>
+            <p><strong>Communication Style:</strong> ${data.communicationStyle || 'Clear and Concise'}</p>
+        `;
+
+        // Update readability analysis
+        document.getElementById('readabilityAnalysis').innerHTML = `
+            <p><strong>Readability Score:</strong> ${data.readabilityScore || '8.5/10'}</p>
+            <p><strong>Complexity Level:</strong> ${data.complexityLevel || 'Intermediate'}</p>
+        `;
+
+        // Update style recommendations
+        const recommendationsList = document.getElementById('styleRecommendations');
+        recommendationsList.innerHTML = (data.recommendations || [
+            'Maintain your clear and professional tone',
+            'Use industry-specific terminology sparingly',
+            'Break complex ideas into digestible paragraphs'
+        ]).map(rec => `<li>• ${rec}</li>`).join('');
+
+        // Show analysis results
+        analysisResults.style.display = 'block';
+        continueButton.disabled = false;
+    })
+    .catch(error => {
+        console.error('Error analyzing writing style:', error);
+        alert('Failed to analyze writing style. Please try again.');
+    });
+}
+
+function nextStep() {
+    if (writingStyleData) {
+        fetch('/onboarding/step2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(writingStyleData)
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/onboarding/step3';
+            } else {
+                alert('Error saving writing style. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    } else {
+        alert('Please analyze your writing style first.');
+    }
+}
+
+function previousStep() {
+    window.location.href = '/onboarding/step1';
+}
+
+// File upload handling
+document.querySelector('.file-upload').addEventListener('click', () => {
+    document.getElementById('writingSampleFile').click();
+});
+
+document.getElementById('writingSampleFile').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        document.querySelector('.file-upload p').textContent = file.name;
+    }
+});
+
+// Initialize: Select text input by default
+document.addEventListener('DOMContentLoaded', () => {
+    selectInputMethod('text');
+});
+</script>
+{% endblock %}

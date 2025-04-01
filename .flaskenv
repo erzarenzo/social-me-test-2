@@ -1,0 +1,3 @@
+FLASK_APP=complete_workflow_test.py
+FLASK_ENV=development
+FLASK_DEBUG=1

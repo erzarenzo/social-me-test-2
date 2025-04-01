@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SocialMe - Writing Style</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --background-color: #ffffff;
+      --text-color: #333333;
+      --accent-color: #4a86e8;
+      --border-color: #e0e0e0;
+      --card-background: #f5f5f5;
+      --button-background: #f0f0f0;
+      --button-hover: #e0e0e0;
+      --analysis-background: #f9f9f9;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .step-indicator {
+      text-align: right;
+      color: var(--accent-color);
+      margin-bottom: 20px;
+      font-size: 0.9em;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: var(--text-color);
+      font-weight: 600;
+    }
+
+    .analysis-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-methods {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .input-method {
+      flex: 1;
+      padding: 15px;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      margin-right: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .input-method:last-child {
+      margin-right: 0;
+    }
+
+    .input-method.active {
+      border-color: var(--accent-color);
+      background-color: rgba(74, 134, 232, 0.05);
+    }
+
+    .input-method h3 {
+      margin-top: 0;
+      font-size: 1em;
+    }
+
+    .input-method p {
+      font-size: 0.8em;
+      color: #666;
+    }
+
+    .input-content {
+      display: none;
+    }
+
+    .input-content.active {
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      font-family: inherit;
+    }
+
+    .file-upload {
+      border: 2px dashed var(--border-color);
+      padding: 20px;
+      text-align: center;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .upload-icon {
+      font-size: 2em;
+      color: var(--accent-color);
+      margin-bottom: 10px;
+    }
+
+    .analyze-button {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-top: 15px;
+    }
+
+    .analyze-button:hover {
+      opacity: 0.9;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .nav-button {
+      background: var(--button-background);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .nav-button:hover {
+      background: var(--button-hover);
+    }
+
+    /* Analysis Results Styling */
+    .analysis-results {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background-color: var(--analysis-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    .analysis-section {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .analysis-section:last-child {
+      border-bottom: none;
+    }
+
+    .section-title {
+      font-weight: bold;
+      color: var(--accent-color);
+      margin-bottom: 8px;
+    }
+
+    .section-content {
+      font-size: 0.95em;
+    }
+
+    .recommendations {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .recommendations li {
+      padding: 5px 0;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .recommendations li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent-color);
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .edit-button, .approve-button {
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .edit-button {
+      background: var(--button-background);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .approve-button {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+    }
+
+    .example-buttons {
+      margin-top: 20px;
+    }
+
+    .sample-button {
+      background: var(--button-background);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .sample-button:hover {
+      background: var(--button-hover);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="step-indicator">Step 2 of 4</div>
+    
+    <h1>Writing Style</h1>
+    
+    <div class="analysis-container">
+      <p>Submit your own content for AI analysis to create a custom writing style profile. Enter text, add a URL, or upload a document.</p>
+      
+      <div class="input-methods">
+        <div class="input-method active" data-method="text">
+          <h3>Enter your content</h3>
+          <p>Paste your article, blog posts, or any text for analysis</p>
+        </div>
+        <div class="input-method" data-method="url">
+          <h3>Enter URL to analyze</h3>
+          <p>Analyze content from an existing website</p>
+        </div>
+        <div class="input-method" data-method="file">
+          <h3>Upload a document</h3>
+          <p>Upload a TXT file with your writing</p>
+        </div>
+      </div>
+      
+      <div class="input-content active" id="text-input">
+        <textarea placeholder="Paste your text here..."></textarea>
+        <div class="example-buttons">
+          <h4>Sample Writing Styles (Click to Apply):</h4>
+          <button class="sample-button" id="sample1">Technical & Detailed</button>
+          <button class="sample-button" id="sample2">Conversational & Friendly</button>
+          <button class="sample-button" id="sample3">Formal & Professional</button>
+        </div>
+      </div>
+      
+      <div class="input-content" id="url-input">
+        <input type="url" placeholder="https://example.com/article">
+      </div>
+      
+      <div class="input-content" id="file-input">
+        <div class="file-upload">
+          <div class="upload-icon">⬆️</div>
+          <p>Upload a TXT file with your writing</p>
+          <input type="file" id="fileUpload" accept=".txt" style="display: none;">
+          <button onclick="document.getElementById('fileUpload').click()">Select Document</button>
+        </div>
+        <div id="fileName" style="text-align: center; margin-top: 10px; font-size: 0.9em; color: #666;"></div>
+      </div>
+      
+      <button class="analyze-button" id="analyzeBtn">Analyze My Writing Style</button>
+    </div>
+    
+    <!-- Analysis Results - Initially Hidden -->
+    <div id="analysisResults" class="analysis-section" style="display: none;">
+      <h2>Writing Style Analysis Results</h2>
+      
+      <div class="analysis-container">
+        <div id="neural-tone-analysis">
+          <h3 id="analysis-heading">Neural Tone Mapper Analysis</h3>
+          
+          <div class="analysis-section">
+            <h4 id="cognitive-profile-title">Cognitive Profile Analysis</h4>
+            
+            <div class="section-content">
+              <h5 id="thought-patterns-title">1. Thought Patterns</h5>
+              <ul id="thought-patterns-list">
+                <li>Integrative Thinking: 78% (Primary pattern)</li>
+                <li>Contrastive Processing: 71% (Combining opposites)</li>
+                <li>Narrative Association: 68%</li>
+                <li>Pragmatic Idealism: 65%</li>
+              </ul>
+              
+              <h5 id="reasoning-architecture-title">2. Reasoning Architecture</h5>
+              <ul id="reasoning-architecture-list">
+                <li>Autobiographical Reasoning: 73% (Dominant approach)</li>
+                <li>Dialectical Synthesis: 67% (Merging contradictions)</li>
+                <li>Identity Construction: 64%</li>
+                <li>Value-Based Decision Making: 59%</li>
+              </ul>
+              
+              <h5 id="communication-framework-title">3. Communication Framework</h5>
+              <ul id="communication-framework-list">
+                <li>Personal-Professional Balance: 62% personal / 38% professional</li>
+                <li>Narrative Density: High (0.81/1.0)</li>
+                <li>Conceptual Network Complexity: High (rich interconnections between disparate domains)</li>
+                <li>Tonal Oscillation: Frequent shifts between poetic/reflective and direct/pragmatic expression</li>
+              </ul>
+              
+              <h5 id="style-adaptation-title">4. Style Adaptation Patterns</h5>
+              <ul id="style-adaptation-list">
+                <li>Domain Bridging: Very High (seamlessly connects art, science, business, technology)</li>
+                <li>Contrastive Identity Framing: Strong (defines self through parental/value contrasts)</li>
+                <li>Temporal Integration: Blends nostalgic elements with forward-looking perspectives</li>
+              </ul>
+              
+              <h5 id="cognitive-strengths-title">5. Cognitive Strengths & Blindspots</h5>
+              <ul id="cognitive-strengths-list">
+                <li>Strengths: Cross-domain integration, value-driven framing, narrative construction</li>
+                <li>Potential Blindspots: Possible overreliance on contrastive identity markers, potential for scattered focus across too many domains</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="analysis-section">
+            <h4 id="conceptual-analysis-title">Conceptual Analysis</h4>
+            <div class="section-content" id="conceptual-analysis-content">
+              <p>Your cognitive style reveals a mind that habitually integrates contradictory elements - artistic with practical, philosophical with data-driven, traditional with innovative. Your thought patterns show strong tendencies toward meaning-making through narrative construction, particularly using personal history as a framework for professional identity.</p>
+              <p>Your communication reveals a distinctive pattern of "contrastive coupling" - regularly pairing opposing concepts to create cognitive tension that resolves into a unique synthesis. This manifests particularly strongly in your identity construction, where you repeatedly define yourself at the intersection of seemingly contradictory influences.</p>
+              <p>This cognitive architecture supports innovation across domains but may occasionally create challenges in establishing a singular professional focus.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="button-row">
+        <button id="editButton" class="secondary-button">Edit Analysis</button>
+        <button id="approveButton" class="primary-button">Approve Profile</button>
+      </div>
+    </div>
+    
+    <div class="button-row">
+      <button class="nav-button" id="backBtn">Back</button>
+      <button class="nav-button" id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
+  <script>
+    // Directly modify the page as soon as it loads
+    window.onload = function() {
+      // Enable all input fields
+      document.querySelectorAll('textarea, input').forEach(function(el) {
+        // Remove any restrictions
+        el.setAttribute('autocomplete', 'on');
+        el.removeAttribute('readonly');
+        el.removeAttribute('disabled');
+        el.removeAttribute('onpaste');
+        el.removeAttribute('oncopy');
+        el.removeAttribute('oncut');
+        
+        // Ensure proper styles
+        el.style.userSelect = 'text';
+        el.style.webkitUserSelect = 'text';
+        el.style.MozUserSelect = 'text';
+        el.style.msUserSelect = 'text';
+        
+        // Clear any event listeners by cloning
+        const newEl = el.cloneNode(true);
+        if (el.parentNode) {
+          el.parentNode.replaceChild(newEl, el);
+        }
+      });
+      
+      // Make sure right-click works
+      document.addEventListener('contextmenu', function(e) {
+        return true; // Allow context menu
+      }, true);
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM elements
+      const inputMethods = document.querySelectorAll('.input-method');
+      const inputContents = document.querySelectorAll('.input-content');
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      const backBtn = document.getElementById('backBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const fileUpload = document.getElementById('fileUpload');
+      const fileName = document.getElementById('fileName');
+      const analysisResults = document.getElementById('analysisResults');
+      const editButton = document.getElementById('editButton');
+      const approveButton = document.getElementById('approveButton');
+      
+      // Enable keyboard navigation
+      document.addEventListener('keydown', function(event) {
+        // Enter key
+        if (event.key === 'Enter') {
+          // Find the active button based on context
+          if (analysisResults.style.display === 'block' && !nextBtn.disabled) {
+            nextBtn.click();
+          } else if (analyzeBtn && document.activeElement.closest('.input-content')) {
+            analyzeBtn.click();
+          }
+        }
+      });
+      
+      // Switch between input methods
+      inputMethods.forEach(method => {
+        method.addEventListener('click', () => {
+          // Remove active class from all methods
+          inputMethods.forEach(m => m.classList.remove('active'));
+          inputContents.forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked method
+          method.classList.add('active');
+          
+          // Show corresponding content
+          const methodName = method.getAttribute('data-method');
+          document.getElementById(`${methodName}-input`).classList.add('active');
+        });
+      });
+      
+      // File upload handling
+      fileUpload.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          fileName.textContent = `File selected: ${e.target.files[0].name}`;
+        }
+      });
+      
+      // Back button functionality
+      backBtn.addEventListener('click', () => {
+        window.location.href = '/';
+      });
+      
+      // Edit analysis functionality
+      editButton.addEventListener('click', () => {
+        // Make analysis sections editable
+        document.querySelectorAll('.section-content p, .recommendations li').forEach(element => {
+          element.contentEditable = true;
+          element.style.backgroundColor = '#f0f7ff';
+          element.style.padding = '5px';
+          element.style.borderRadius = '3px';
+        });
+        
+        // Change button text
+        editButton.textContent = 'Save Changes';
+        editButton.classList.add('save-button');
+        
+        // Change function on next click
+        editButton.removeEventListener('click', editButton.clickHandler);
+        editButton.clickHandler = () => {
+          // Save changes
+          document.querySelectorAll('.section-content p, .recommendations li').forEach(element => {
+            element.contentEditable = false;
+            element.style.backgroundColor = '';
+            element.style.padding = '';
+            element.style.borderRadius = '';
+          });
+          
+          // Restore button
+          editButton.textContent = 'Edit Analysis';
+          editButton.classList.remove('save-button');
+          
+          // Reset click handler
+          editButton.removeEventListener('click', editButton.clickHandler);
+          editButton.addEventListener('click', editButton.originalClickHandler);
+        };
+        editButton.addEventListener('click', editButton.clickHandler);
+      });
+      // Store original click handler
+      editButton.originalClickHandler = editButton.onclick;
+      
+      // Approve profile functionality
+      approveButton.addEventListener('click', () => {
+        // Visual feedback
+        approveButton.textContent = 'Profile Approved ✓';
+        approveButton.classList.add('approved');
+        approveButton.disabled = true;
+        
+        // Enable next button with clear visual cue
+        nextBtn.disabled = false;
+        nextBtn.classList.add('highlight-next');
+        
+        // Add a tooltip or instruction
+        const instruction = document.createElement('div');
+        instruction.className = 'next-instruction';
+        instruction.textContent = 'Click Next to continue to Content Strategy';
+        instruction.style.color = '#4a86e8';
+        instruction.style.fontWeight = 'bold';
+        instruction.style.marginTop = '10px';
+        instruction.style.textAlign = 'center';
+        document.querySelector('.button-row').prepend(instruction);
+      });
+      
+      // Analyze button functionality
+      analyzeBtn.addEventListener('click', () => {
+        // Show loading state
+        analyzeBtn.textContent = 'Analyzing...';
+        analyzeBtn.disabled = true;
+        
+        // Determine which input method is active
+        const activeMethod = document.querySelector('.input-method.active').getAttribute('data-method');
+        let content = '';
+        let contentType = '';
+        
+        if (activeMethod === 'text') {
+          content = document.querySelector('#text-input textarea').value;
+          contentType = 'text';
+        } else if (activeMethod === 'url') {
+          content = document.querySelector('#url-input input').value;
+          contentType = 'url';
+        } else if (activeMethod === 'file') {
+          const fileInput = document.getElementById('fileUpload');
+          if (fileInput.files.length > 0) {
+            contentType = 'file';
+            // In a real implementation, we would handle file uploads properly
+          } else {
+            alert('Please select a file first');
+            analyzeBtn.textContent = 'Analyze My Writing Style';
+            analyzeBtn.disabled = false;
+            return;
+          }
+        }
+        
+        if (!content && contentType !== 'file') {
+          alert('Please enter some content to analyze');
+          analyzeBtn.textContent = 'Analyze My Writing Style';
+          analyzeBtn.disabled = false;
+          return;
+        }
+        
+        // Create form data for the request
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('type', contentType);
+        
+        // Send the analysis request to the server
+        console.log("Sending analysis request:", content.substring(0, 50), contentType);
+        fetch('/analyze-content', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          console.log("Response received:", response.status);
+          return response.json();
+        })
+        .then(data => {
+          console.log("Data received:", data);
+          if (data.status === 'success') {
+            // Update the analysis UI with the results
+            updateAnalysisUI(data.analysis);
+            analysisResults.style.display = 'block';
+            
+            // Don't enable Next yet - require approval first
+            approveButton.disabled = false;
+            editButton.disabled = false;
+            
+            // Add instruction for clarity
+            if (!document.querySelector('.analysis-instruction')) {
+              const analysisInstruction = document.createElement('div');
+              analysisInstruction.className = 'analysis-instruction';
+              analysisInstruction.textContent = 'Review your profile and approve or edit before continuing';
+              analysisInstruction.style.color = '#4a86e8';
+              analysisInstruction.style.marginBottom = '15px';
+              analysisInstruction.style.textAlign = 'center';
+              analysisResults.prepend(analysisInstruction);
+            }
+          } else {
+            console.error("Analysis error:", data.message);
+            // Create error message display
+            const errorContainer = document.createElement('div');
+            errorContainer.style.backgroundColor = '#ff4c4c';
+            errorContainer.style.color = 'white';
+            errorContainer.style.padding = '15px';
+            errorContainer.style.borderRadius = '5px';
+            errorContainer.style.marginTop = '15px';
+            errorContainer.style.marginBottom = '15px';
+            errorContainer.style.textAlign = 'center';
+            errorContainer.innerHTML = `<strong>Error:</strong> ${data.message}`;
+            
+            // Add a suggestion based on the error
+            if (data.message.includes('URL')) {
+              errorContainer.innerHTML += '<p>Try using the direct text input instead, or a different URL.</p>';
+            }
+            
+            // Insert error message before the analyze button
+            analyzeBtn.parentNode.insertBefore(errorContainer, analyzeBtn);
+            
+            // Auto-remove the error after 10 seconds
+            setTimeout(() => {
+              if (errorContainer.parentNode) {
+                errorContainer.parentNode.removeChild(errorContainer);
+              }
+            }, 10000);
+            
+            alert(data.message || 'Error analyzing content');
+          }
+          analyzeBtn.textContent = 'Analyze My Writing Style';
+          analyzeBtn.disabled = false;
+        })
+        .catch(error => {
+          console.error('Error analyzing content:', error);
+          alert('Error: ' + error.message);
+          analyzeBtn.textContent = 'Analyze My Writing Style';
+          analyzeBtn.disabled = false;
+        });
+      });
+      
+      // Function to update the analysis UI with results from the server
+      function updateAnalysisUI(analysis) {
+        // Update heading
+        document.getElementById('analysis-heading').textContent = analysis.heading || 'Neural Tone Mapper Analysis';
+        
+        // Update cognitive profile section
+        if (analysis.cognitive_profile_analysis) {
+          document.getElementById('cognitive-profile-title').textContent = analysis.cognitive_profile_analysis.title || 'Cognitive Profile Analysis';
+          
+          // Update thought patterns
+          if (analysis.cognitive_profile_analysis.thought_patterns) {
+            document.getElementById('thought-patterns-title').textContent = analysis.cognitive_profile_analysis.thought_patterns.title || '1. Thought Patterns';
+            const thoughtPatternsList = document.getElementById('thought-patterns-list');
+            thoughtPatternsList.innerHTML = '';
+            analysis.cognitive_profile_analysis.thought_patterns.items.forEach(item => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              thoughtPatternsList.appendChild(li);
+            });
+          }
+          
+          // Update reasoning architecture
+          if (analysis.cognitive_profile_analysis.reasoning_architecture) {
+            document.getElementById('reasoning-architecture-title').textContent = analysis.cognitive_profile_analysis.reasoning_architecture.title || '2. Reasoning Architecture';
+            const reasoningList = document.getElementById('reasoning-architecture-list');
+            reasoningList.innerHTML = '';
+            analysis.cognitive_profile_analysis.reasoning_architecture.items.forEach(item => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              reasoningList.appendChild(li);
+            });
+          }
+          
+          // Update communication framework
+          if (analysis.cognitive_profile_analysis.communication_framework) {
+            document.getElementById('communication-framework-title').textContent = analysis.cognitive_profile_analysis.communication_framework.title || '3. Communication Framework';
+            const commList = document.getElementById('communication-framework-list');
+            commList.innerHTML = '';
+            analysis.cognitive_profile_analysis.communication_framework.items.forEach(item => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              commList.appendChild(li);
+            });
+          }
+          
+          // Update style adaptation patterns
+          if (analysis.cognitive_profile_analysis.style_adaptation_patterns) {
+            document.getElementById('style-adaptation-title').textContent = analysis.cognitive_profile_analysis.style_adaptation_patterns.title || '4. Style Adaptation Patterns';
+            const styleList = document.getElementById('style-adaptation-list');
+            styleList.innerHTML = '';
+            analysis.cognitive_profile_analysis.style_adaptation_patterns.items.forEach(item => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              styleList.appendChild(li);
+            });
+          }
+          
+          // Update cognitive strengths
+          if (analysis.cognitive_profile_analysis.cognitive_strengths_blindspots) {
+            document.getElementById('cognitive-strengths-title').textContent = analysis.cognitive_profile_analysis.cognitive_strengths_blindspots.title || '5. Cognitive Strengths & Blindspots';
+            const strengthsList = document.getElementById('cognitive-strengths-list');
+            strengthsList.innerHTML = '';
+            analysis.cognitive_profile_analysis.cognitive_strengths_blindspots.items.forEach(item => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              strengthsList.appendChild(li);
+            });
+          }
+        }
+        
+        // Update conceptual analysis
+        if (analysis.conceptual_analysis) {
+          document.getElementById('conceptual-analysis-title').textContent = analysis.conceptual_analysis.title || 'Conceptual Analysis';
+          const conceptualContent = document.getElementById('conceptual-analysis-content');
+          conceptualContent.innerHTML = '';
+          analysis.conceptual_analysis.paragraphs.forEach(paragraph => {
+            const p = document.createElement('p');
+            p.textContent = paragraph;
+            conceptualContent.appendChild(p);
+          });
+        }
+      }
+      
+      // Next button functionality
+      nextBtn.addEventListener('click', () => {
+        // First save the current state
+        fetch('/next_step', {
+          method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Next step response:', data);
+          // Navigate to step 3
+          window.location.href = '/step3';
+        })
+        .catch(error => {
+          console.error('Error proceeding to next step:', error);
+          // Even on error, try to navigate
+          window.location.href = '/step3';
+        });
+      });
+      
+      // Sample writing styles
+      const technicalSample = "In examining the implementation of distributed systems architecture, it's essential to consider both scalability and resilience. Our research indicates that a microservices approach, when properly containerized and orchestrated, provides significant advantages over monolithic structures. The technical debt incurred through legacy systems often manifests in reduced agility and increased maintenance costs. We've found that incremental migration strategies yield optimal results when paired with comprehensive testing protocols.";
+      
+      const conversationalSample = "Hey there! I've been thinking a lot about how we connect with audiences these days. It's crazy how fast things change, right? I find that authentic storytelling really cuts through the noise. When I write content, I like to imagine I'm having coffee with a friend – keeping things relaxed but still super helpful. And let's be honest, nobody has time for fluff content anymore! I always try to get to the point while throwing in some personality. What do you think works best?";
+      
+      const formalSample = "It is our considered opinion that strategic implementation of content architecture represents a fundamental cornerstone of organizational communication efficacy. The institution of proper governance protocols ensures consistent messaging across all customer-facing channels. Furthermore, adherence to established best practices facilitates the development of scalable content operations. We respectfully submit that these principles should be adopted forthwith.";
+      
+      // Add click event listeners to sample buttons
+      document.getElementById('sample1').addEventListener('click', function() {
+        document.querySelector('#text-input textarea').value = technicalSample;
+      });
+      
+      document.getElementById('sample2').addEventListener('click', function() {
+        document.querySelector('#text-input textarea').value = conversationalSample;
+      });
+      
+      document.getElementById('sample3').addEventListener('click', function() {
+        document.querySelector('#text-input textarea').value = formalSample;
+      });
+    });
+  </script>
+</body>
+</html>

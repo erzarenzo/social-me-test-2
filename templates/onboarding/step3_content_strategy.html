@@ -1,0 +1,352 @@
+{% extends "onboarding/base_step.html" %}
+
+{% block title %}SocialMe - Content Strategy{% endblock %}
+
+{% block step_styles %}
+<style>
+    :root {
+        --background-color: #ffffff;
+        --text-color: #333333;
+        --accent-color: #4a86e8;
+        --border-color: #e0e0e0;
+        --card-background: #f5f5f5;
+        --button-background: #f0f0f0;
+        --button-hover: #e0e0e0;
+        --info-color: #4a86e8;
+        --info-color-hover: #3a76c8;
+    }
+
+    .strategy-form {
+        margin-top: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group h2 {
+        font-size: 1.4em;
+        margin-bottom: 10px;
+        font-weight: 500;
+        color: var(--accent-color);
+    }
+
+    .form-group p {
+        margin-bottom: 15px;
+        color: #666;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 1em;
+        resize: vertical;
+        transition: border-color 0.3s ease;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
+    }
+
+    .word-count {
+        text-align: right;
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .frequency-options {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .frequency-option {
+        flex: 1;
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .frequency-option:hover {
+        border-color: var(--accent-color);
+        background-color: rgba(74, 134, 232, 0.05);
+    }
+
+    .frequency-option.selected {
+        border-color: var(--accent-color);
+        background-color: rgba(74, 134, 232, 0.1);
+        box-shadow: 0 2px 5px rgba(74, 134, 232, 0.2);
+    }
+
+    .frequency-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--text-color);
+    }
+
+    .frequency-desc {
+        font-size: 0.9em;
+        color: #666;
+    }
+
+    .topic-fields {
+        margin-bottom: 25px;
+    }
+
+    .primary-topic, .secondary-topics {
+        margin-bottom: 15px;
+    }
+
+    .field-hint {
+        font-size: 0.8em;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .examples-section {
+        background-color: var(--card-background);
+        border-radius: 5px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    .sample-button {
+        background-color: var(--button-background);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 8px 15px;
+        margin: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .sample-button:hover {
+        background-color: var(--button-hover);
+        border-color: var(--accent-color);
+    }
+</style>
+{% endblock %}
+
+{% block step_content %}
+<div class="container">
+    <div class="step-indicator">Step 3 of 4</div>
+    
+    <h1>Define Your Content Strategy</h1>
+    
+    <div class="info-box">
+        <p>Help us understand the goals and focus of your content. This will guide our AI in generating targeted, relevant articles.</p>
+    </div>
+
+    <div class="strategy-form">
+        <div class="form-group topic-fields">
+            <h2>Content Topics</h2>
+            <div class="primary-topic">
+                <label for="primaryTopic">Primary Topic</label>
+                <input type="text" id="primaryTopic" class="form-control" placeholder="Enter your main content focus">
+                <div class="field-hint">The core subject area your content will primarily address</div>
+            </div>
+
+            <div class="secondary-topics">
+                <label for="secondaryTopics">Secondary Topics</label>
+                <textarea id="secondaryTopics" placeholder="List related topics or subtopics"></textarea>
+                <div class="word-count" id="secondaryTopicsCount">0/500 words</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <h2>Content Goals</h2>
+            <textarea id="contentGoals" placeholder="What do you want to achieve with your content? (e.g., educate, convert, entertain)"></textarea>
+            <div class="word-count" id="contentGoalsCount">0/300 words</div>
+        </div>
+
+        <div class="form-group">
+            <h2>Publication Frequency</h2>
+            <div class="frequency-options">
+                <div class="frequency-option" data-frequency="weekly" onclick="selectFrequency('weekly')">
+                    <div class="frequency-title">Weekly</div>
+                    <div class="frequency-desc">1-2 articles per week</div>
+                </div>
+                <div class="frequency-option" data-frequency="biweekly" onclick="selectFrequency('biweekly')">
+                    <div class="frequency-title">Bi-Weekly</div>
+                    <div class="frequency-desc">1 article every 2 weeks</div>
+                </div>
+                <div class="frequency-option" data-frequency="monthly" onclick="selectFrequency('monthly')">
+                    <div class="frequency-title">Monthly</div>
+                    <div class="frequency-desc">1 article per month</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="examples-section">
+            <h3>Need Inspiration?</h3>
+            <p>Click a button to see an example strategy:</p>
+            <div class="example-buttons">
+                <button class="sample-button" onclick="loadSampleStrategy('tech')">Tech Startup</button>
+                <button class="sample-button" onclick="loadSampleStrategy('marketing')">Marketing Agency</button>
+                <button class="sample-button" onclick="loadSampleStrategy('ecommerce')">E-Commerce</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="button-row">
+        <button class="nav-button" onclick="previousStep()">Back</button>
+        <button class="nav-button" onclick="nextStep()" id="nextBtn" disabled>Next</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block step_scripts %}
+<script>
+let contentStrategy = {
+    primaryTopic: '',
+    secondaryTopics: '',
+    contentGoals: '',
+    publicationFrequency: null
+};
+
+function updateWordCount(textareaId, counterId) {
+    const textarea = document.getElementById(textareaId);
+    const counter = document.getElementById(counterId);
+    const wordCount = textarea.value.trim().split(/\s+/).length;
+    const maxWords = textareaId === 'secondaryTopics' ? 500 : 300;
+    
+    counter.textContent = `${wordCount}/${maxWords} words`;
+    
+    if (wordCount > maxWords) {
+        textarea.value = textarea.value.split(/\s+/).slice(0, maxWords).join(' ');
+        counter.style.color = 'red';
+    } else {
+        counter.style.color = '#666';
+    }
+    
+    validateForm();
+}
+
+function selectFrequency(frequency) {
+    // Remove selected class from all options
+    document.querySelectorAll('.frequency-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked option
+    const selectedOption = document.querySelector(`.frequency-option[data-frequency="${frequency}"]`);
+    selectedOption.classList.add('selected');
+    
+    contentStrategy.publicationFrequency = frequency;
+    validateForm();
+}
+
+function validateForm() {
+    const primaryTopic = document.getElementById('primaryTopic').value.trim();
+    const secondaryTopics = document.getElementById('secondaryTopics').value.trim();
+    const contentGoals = document.getElementById('contentGoals').value.trim();
+    const frequencySelected = contentStrategy.publicationFrequency !== null;
+    
+    const nextBtn = document.getElementById('nextBtn');
+    
+    if (primaryTopic && secondaryTopics && contentGoals && frequencySelected) {
+        nextBtn.disabled = false;
+        
+        // Update content strategy object
+        contentStrategy.primaryTopic = primaryTopic;
+        contentStrategy.secondaryTopics = secondaryTopics;
+        contentStrategy.contentGoals = contentGoals;
+    } else {
+        nextBtn.disabled = true;
+    }
+}
+
+function loadSampleStrategy(type) {
+    let sample;
+    switch(type) {
+        case 'tech':
+            sample = {
+                primaryTopic: 'AI and Machine Learning',
+                secondaryTopics: 'Cloud Computing\nData Science\nTech Innovation\nStartup Ecosystem',
+                contentGoals: 'Educate tech professionals about emerging AI technologies, showcase innovative solutions, and provide insights into the future of machine learning.',
+                publicationFrequency: 'weekly'
+            };
+            break;
+        case 'marketing':
+            sample = {
+                primaryTopic: 'Digital Marketing Strategies',
+                secondaryTopics: 'Social Media Marketing\nContent Marketing\nSEO Techniques\nBrand Development',
+                contentGoals: 'Help businesses improve their online presence, provide actionable marketing tips, and demonstrate cutting-edge digital marketing approaches.',
+                publicationFrequency: 'biweekly'
+            };
+            break;
+        case 'ecommerce':
+            sample = {
+                primaryTopic: 'E-Commerce Growth Hacking',
+                secondaryTopics: 'Customer Acquisition\nConversion Optimization\nUser Experience\nOnline Retail Trends',
+                contentGoals: 'Guide e-commerce entrepreneurs in scaling their online businesses, share success stories, and provide practical strategies for increasing sales.',
+                publicationFrequency: 'monthly'
+            };
+            break;
+    }
+    
+    // Populate form with sample strategy
+    document.getElementById('primaryTopic').value = sample.primaryTopic;
+    document.getElementById('secondaryTopics').value = sample.secondaryTopics;
+    document.getElementById('contentGoals').value = sample.contentGoals;
+    
+    // Select frequency
+    selectFrequency(sample.publicationFrequency);
+    
+    // Trigger word count and validation
+    updateWordCount('secondaryTopics', 'secondaryTopicsCount');
+    updateWordCount('contentGoals', 'contentGoalsCount');
+}
+
+function nextStep() {
+    if (validateForm()) {
+        fetch('/onboarding/step3', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(contentStrategy)
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/onboarding/step4';
+            } else {
+                alert('Error saving content strategy. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+}
+
+function previousStep() {
+    window.location.href = '/onboarding/step2';
+}
+
+// Event Listeners
+document.getElementById('primaryTopic').addEventListener('input', validateForm);
+document.getElementById('secondaryTopics').addEventListener('input', () => {
+    updateWordCount('secondaryTopics', 'secondaryTopicsCount');
+});
+document.getElementById('contentGoals').addEventListener('input', () => {
+    updateWordCount('contentGoals', 'contentGoalsCount');
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    validateForm();
+});
+</script>
+{% endblock %}

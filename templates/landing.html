@@ -1,0 +1,111 @@
+{% extends "layout/socialme_base.html" %}
+
+{% block title %}SocialMe - Your Personal AI Content Powerhouse{% endblock %}
+
+{% block head %}
+<style>
+  /* Override dark theme for landing page */
+  :root {
+    --background-color: #e8f4f1;
+    --text-color: #1a2a3a;
+    --accent-color: #3b5998;
+    --button-color: #3b5998;
+    --button-hover: #2d4373;
+  }
+
+  body {
+    background: var(--background-color);
+    color: var(--text-color);
+  }
+
+  .hero-section {
+    padding: 6rem 2rem;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background-color: #e8eef7;
+    color: var(--accent-color);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    line-height: 1.2;
+  }
+
+  .hero-description {
+    font-size: 1.2rem;
+    color: #4a5568;
+    max-width: 800px;
+    margin: 0 auto 3rem auto;
+  }
+
+  .button-container {
+    margin-top: 2rem;
+  }
+
+  .cta-button {
+    background-color: var(--button-color);
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s;
+  }
+
+  .cta-button:hover {
+    background-color: var(--button-hover);
+    color: white;
+    text-decoration: none;
+  }
+
+  .secondary-button {
+    background-color: transparent;
+    color: var(--text-color);
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    display: inline-block;
+    margin-left: 1rem;
+    border: 1px solid #d1d5db;
+    transition: background-color 0.3s;
+  }
+
+  .secondary-button:hover {
+    background-color: #f3f4f6;
+    color: var(--text-color);
+    text-decoration: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+  <div class="hero-badge">NEW</div>
+  <h1 class="hero-title">Create More. Grow Faster.<br>Sound Exactly Like You.</h1>
+  <p class="hero-description">
+    Are you a Substack writer, entrepreneur, or influencer who spends hours crafting content, 
+    only to feel overwhelmed by keeping up with strategy, voice consistency, and endless promotion? 
+    Meet SocialMe AI, your personal content strategist and ghostwriter, trained to think, write, 
+    and engage exactly like you.
+  </p>
+  <div class="button-container">
+    <a href="/onboarding" class="cta-button">Start Your Free Trial</a>
+    <a href="#features" class="secondary-button">Learn More</a>
+  </div>
+</div>
+{% endblock %}

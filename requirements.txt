@@ -1,0 +1,9 @@
+requests
+python-dotenv
+termcolor
+flask
+pytest
+sqlalchemy
+spacy
+scikit-learn
+anthropic

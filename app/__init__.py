@@ -1,0 +1,3 @@
+"""
+SocialMe application package.
+"""

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SocialMe - Content Sources</title>
+  <style>
+    :root {
+      --background-color: #ffffff;
+      --card-background: #f5f5f5;
+      --text-color: #333333;
+      --accent-color: #4a86e8;
+      --border-color: #e0e0e0;
+      --button-background: #f0f0f0;
+      --button-hover: #e0e0e0;
+      --modal-overlay: rgba(0, 0, 0, 0.5);
+      --error-color: #e74c3c;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .step-indicator {
+      text-align: right;
+      color: var(--accent-color);
+      margin-bottom: 20px;
+      font-size: 0.9em;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: var(--text-color);
+      font-weight: 600;
+    }
+
+    .content-container {
+      background: var(--card-background);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid var(--border-color);
+    }
+
+    .source-types {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
+    }
+
+    .source-types li {
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      line-height: 1.4;
+    }
+
+    .source-types li:before {
+      content: "•";
+      color: var(--accent-color);
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .source-counter {
+      margin: 20px 0;
+      color: var(--text-color);
+      font-weight: 500;
+    }
+
+    .source-counter .min-max {
+      font-size: 0.8em;
+      color: #777;
+      margin-top: 3px;
+    }
+
+    .source-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .add-source-button {
+      background: var(--button-background);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 150px;
+      min-height: 36px;
+      transition: all 0.3s ease;
+    }
+
+    .add-source-button.pulsating {
+      animation: pulse 2s infinite;
+      background-color: rgba(231, 76, 60, 0.1);
+      border-color: #e74c3c;
+      color: #e74c3c;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+      }
+    }
+
+    .add-source-button:hover {
+      background: var(--button-hover);
+    }
+
+    .source-item {
+      background: var(--button-background);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9em;
+    }
+
+    .source-item .icon {
+      color: var(--accent-color);
+      font-size: 1.2em;
+    }
+
+    .source-item .remove {
+      color: var(--error-color);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 1.2em;
+      margin-left: 8px;
+    }
+
+    .content-analysis {
+      margin-top: 30px;
+    }
+
+    .content-analysis-header {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .source-preview {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin: 15px 0;
+      overflow: hidden;
+    }
+
+    .source-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      background: var(--button-background);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .source-url {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .source-url-icon {
+      color: var(--accent-color);
+    }
+
+    .visit-link {
+      background: var(--button-background);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.8em;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .visit-link:hover {
+      background: var(--button-hover);
+    }
+
+    .source-preview-content {
+      padding: 15px;
+      font-size: 0.9em;
+      line-height: 1.6;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-overlay);
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--background-color);
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      width: 80%;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .modal-title {
+      font-size: 1.4em;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal input[type="url"] {
+      width: 95%;
+      padding: 10px;
+      margin: 10px 0;
+      background: var(--background-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-color);
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .nav-button {
+      background: var(--button-background);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .nav-button:hover {
+      background: var(--button-hover);
+    }
+
+    .nav-button[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .no-sources {
+      text-align: center;
+      color: #777;
+      padding: 15px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="step-indicator">Step 1 of 4</div>
+    
+    <h1>Content Sources</h1>
+    
+    <div class="content-container">
+      <p>Add links to content sources that represent your brand's voice and topics. These will be analyzed to generate content that matches your style.</p>
+      
+      <ul class="source-types">
+        <li><strong>LinkedIn profiles</strong> - Professional content from your team</li>
+        <li><strong>Twitter/X accounts</strong> - Social media tone and messaging</li>
+        <li><strong>Blog articles</strong> - In-depth writing style and topics</li>
+        <li><strong>RSS feeds</strong> - Regular content publications</li>
+        <li><strong>News sources</strong> - Industry publications you follow</li>
+        <li><strong>Newsletters</strong> - Email content you admire</li>
+      </ul>
+    </div>
+
+    <div class="source-counter">
+      Your Content Sources <span id="sourceCount">0</span>/12
+      <div class="min-max">(minimum 3, maximum 12)</div>
+    </div>
+
+    <div class="source-grid" id="sourceGrid">
+      <!-- Source items will be displayed here -->
+    </div>
+
+    <div class="content-analysis" id="contentAnalysis">
+      <!-- Source analyses will be displayed here -->
+    </div>
+    
+    <div class="button-row">
+      <button class="nav-button" id="backBtn" disabled>Back</button>
+      <button class="nav-button" id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
+  <!-- Add Source Modal -->
+  <div class="modal" id="addSourceModal">
+    <div class="modal-content">
+      <span class="close-button" id="closeModal">&times;</span>
+      <h2 class="modal-title">Add Content Source</h2>
+      <p>Add a link to the content that represents your brand's voice and style.</p>
+      
+      <form id="addSourceForm">
+        <label for="sourceUrl">Source URL:</label>
+        <input type="url" id="sourceUrl" name="url" placeholder="https://www.example.org/" required>
+        <input type="hidden" name="source_type" value="general">
+        
+        <button type="submit" class="add-source-button">Add</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Global variables
+    const MIN_SOURCES = 3;
+    const MAX_SOURCES = 12;
+    let sources = [];
+
+    // DOM elements
+    const sourceCountElement = document.getElementById('sourceCount');
+    const sourceGrid = document.getElementById('sourceGrid');
+    const contentAnalysis = document.getElementById('contentAnalysis');
+    const addSourceModal = document.getElementById('addSourceModal');
+    const addSourceForm = document.getElementById('addSourceForm');
+    const closeModalBtn = document.getElementById('closeModal');
+    const nextBtn = document.getElementById('nextBtn');
+    const backBtn = document.getElementById('backBtn');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchSources();
+      renderAddButton();
+    });
+
+    // Fetch sources from server
+    function fetchSources() {
+      fetch('/get_sources')
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            sources = data.sources || [];
+            updateUI();
+          }
+        })
+        .catch(error => console.error('Error fetching sources:', error));
+    }
+
+    // Update the entire UI
+    function updateUI() {
+      updateSourceCount();
+      renderSourceGrid();
+      renderAnalysisSection();
+      updateNextButton();
+    }
+
+    // Update source counter
+    function updateSourceCount() {
+      sourceCountElement.textContent = sources.length;
+    }
+
+    // Update next button state
+    function updateNextButton() {
+      nextBtn.disabled = sources.length < MIN_SOURCES;
+    }
+
+    // Render source grid
+    function renderSourceGrid() {
+      sourceGrid.innerHTML = '';
+      
+      // Add existing sources
+      sources.forEach((source, index) => {
+        const sourceItem = document.createElement('div');
+        sourceItem.className = 'source-item';
+        
+        const icon = document.createElement('span');
+        icon.className = 'icon';
+        icon.innerHTML = '&#x1F517;';
+        
+        const sourceText = document.createElement('span');
+        sourceText.textContent = source.link;
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove';
+        removeBtn.innerHTML = '&#x2715;';
+        removeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          removeSource(index);
+        });
+        
+        sourceItem.appendChild(icon);
+        sourceItem.appendChild(sourceText);
+        sourceItem.appendChild(removeBtn);
+        sourceGrid.appendChild(sourceItem);
+      });
+      
+      // Add the "Add Source" button if not at max
+      renderAddButton();
+    }
+    
+    // Render the Add Source button
+    function renderAddButton() {
+      if (sources.length < MAX_SOURCES) {
+        const addButton = document.createElement('button');
+        addButton.className = 'add-source-button';
+        
+        if (sources.length < MIN_SOURCES) {
+          addButton.classList.add('pulsating');
+          addButton.textContent = `Add Source (${MIN_SOURCES - sources.length} more required)`;
+        } else {
+          addButton.textContent = 'Add Source';
+        }
+        
+        addButton.addEventListener('click', openAddSourceModal);
+        sourceGrid.appendChild(addButton);
+      }
+    }
+    
+    // Open the add source modal
+    function openAddSourceModal() {
+      addSourceModal.style.display = 'block';
+    }
+    
+    // Close the add source modal
+    function closeAddSourceModal() {
+      addSourceModal.style.display = 'none';
+      addSourceForm.reset();
+    }
+    
+    // Close modal when clicking X
+    closeModalBtn.addEventListener('click', closeAddSourceModal);
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+      if (event.target === addSourceModal) {
+        closeAddSourceModal();
+      }
+    });
+
+    // Render content analysis section
+    function renderAnalysisSection() {
+      contentAnalysis.innerHTML = '';
+      
+      if (sources.length === 0) return;
+      
+      // Add header
+      const header = document.createElement('div');
+      header.className = 'content-analysis-header';
+      header.textContent = 'Content Analysis';
+      contentAnalysis.appendChild(header);
+      
+      // Add source previews
+      sources.forEach(source => {
+        const preview = document.createElement('div');
+        preview.className = 'source-preview';
+        
+        // Header with URL and visit link
+        const previewHeader = document.createElement('div');
+        previewHeader.className = 'source-preview-header';
+        
+        const urlContainer = document.createElement('div');
+        urlContainer.className = 'source-url';
+        
+        const urlIcon = document.createElement('span');
+        urlIcon.className = 'source-url-icon';
+        urlIcon.innerHTML = '&#x1F517;';
+        
+        const urlText = document.createElement('span');
+        urlText.textContent = source.link;
+        
+        urlContainer.appendChild(urlIcon);
+        urlContainer.appendChild(urlText);
+        
+        const visitLink = document.createElement('a');
+        visitLink.href = source.link;
+        visitLink.target = '_blank';
+        visitLink.className = 'visit-link';
+        visitLink.innerHTML = 'Visit &#x2197;';
+        
+        previewHeader.appendChild(urlContainer);
+        previewHeader.appendChild(visitLink);
+        
+        // Content preview
+        const previewContent = document.createElement('div');
+        previewContent.className = 'source-preview-content';
+        
+        if (source.summary) {
+          previewContent.textContent = source.summary;
+        } else {
+          previewContent.textContent = 'Content analysis in progress. This article appears to discuss economic development and regional analysis topics.';
+        }
+        
+        preview.appendChild(previewHeader);
+        preview.appendChild(previewContent);
+        contentAnalysis.appendChild(preview);
+      });
+    }
+
+    // Handle form submission
+    addSourceForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      
+      const urlInput = document.getElementById('sourceUrl');
+      const url = urlInput.value.trim();
+      
+      if (!url) {
+        alert('Please enter a valid URL');
+        return;
+      }
+      
+      // Prepare form data
+      const formData = new FormData();
+      formData.append('url', url);
+      formData.append('source_type', 'general');
+      
+      // Show loading state on button
+      const submitButton = addSourceForm.querySelector('button[type="submit"]');
+      const originalText = submitButton.textContent;
+      submitButton.textContent = 'Adding...';
+      submitButton.disabled = true;
+      
+      // Submit to server
+      fetch('/add_source', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Server response:', data);
+        
+        if (data.status === 'success' || data.status === 'partial') {
+          // Add source to local array if not already there
+          const exists = sources.some(source => source.link === data.source.link);
+          if (!exists) {
+            sources.push(data.source);
+          }
+          
+          // Update UI and close modal
+          updateUI();
+          closeAddSourceModal();
+        } else {
+          alert(data.message || 'Error adding source');
+        }
+      })
+      .catch(error => {
+        console.error('Error adding source:', error);
+        alert('Error adding source. Please try again.');
+      })
+      .finally(() => {
+        // Reset button state
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+      });
+    });
+
+    // Remove a source
+    function removeSource(index) {
+      fetch(`/remove_source/${index}`, {
+        method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          sources.splice(index, 1);
+          updateUI();
+        } else {
+          alert(data.message || 'Error removing source');
+        }
+      })
+      .catch(error => {
+        console.error('Error removing source:', error);
+        alert('Error removing source. Please try again.');
+      });
+    }
+
+    // Handle next button click
+    nextBtn.addEventListener('click', () => {
+      if (sources.length >= MIN_SOURCES) {
+        fetch('/next_step', {
+          method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success' && data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            alert(data.message || 'Error proceeding to next step');
+          }
+        })
+        .catch(error => {
+          console.error('Error proceeding to next step:', error);
+          alert('Error proceeding to next step. Please try again.');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

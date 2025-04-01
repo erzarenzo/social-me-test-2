@@ -1,0 +1,512 @@
+#!/usr/bin/env python3
+"""
+Complete Workflow Test for SocialMe Application:
+1. User inputs sources for data points
+2. User inputs sources for tone and writing style analysis
+3. User sets content strategy and timing schedules
+4. App generates content by:
+   a) Crawling the first URL for data points using the quantum universal crawler
+   b) Analyzing the tone using the quantum tone analyzer
+   c) Writing a detailed article combining data points and adapting to user's tone
+"""
+
+import os
+import json
+import logging
+import datetime
+import random
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from dotenv import load_dotenv
+
+# Load environment variables first
+load_dotenv()
+
+# Import standardized configuration
+from app.utils.config import config
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO if not config.debug else logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("workflow_test.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("workflow_test")
+
+# Initialize the components we need from the standardized structure
+from app.generators.factory import get_article_generator
+try:
+    from app.services.neural_tone_mapper import NeuralToneMapper
+    from app.crawlers.tone import ToneCrawler 
+    from app.crawlers.universal import UniversalCrawler
+    from app.utils.helpers import extract_topics, extract_key_insights, extract_supporting_data
+    tone_mapper_available = True
+except ImportError:
+    logger.warning("Some standardized components not available. Falling back to original imports.")
+    try:
+        from app.neural_tone_mapper import NeuralToneMapper
+        from app.standalone_tone_analyzer import QuantumToneCrawler as ToneCrawler
+        from quantum_universal_crawler import QuantumUniversalCrawler as UniversalCrawler
+        from app.crawler_utils import extract_topics, extract_key_insights, extract_supporting_data
+        tone_mapper_available = True
+    except ImportError:
+        logger.warning("Neural components not available. Using simulated tone analysis.")
+        tone_mapper_available = False
+
+# Initialize Flask app
+app = Flask(__name__, 
+            template_folder=config.get('template_folder', 'templates'),
+            static_folder=config.get('static_folder', 'static'))
+
+# Configure Flask app
+app.secret_key = config.secret_key
+
+# Initialize the ArticleGenerator using the factory pattern
+article_generator = get_article_generator(generator_type='auto')
+
+# In-memory storage for the workflow
+class WorkflowData:
+    def __init__(self):
+        self.data_sources = []
+        self.tone_sources = []
+        self.content_strategy = {}
+        self.tone_analysis = {}
+        self.crawled_data = {}
+        self.generated_article = {}
+        self.current_step = 1
+
+workflow = WorkflowData()
+
+# Routes for each step of the workflow
+@app.route('/')
+def index():
+    """Landing page with the hero image and 'Start Free Trial' button"""
+    logger.info("Rendering landing page")
+    return render_template('landing.html')
+
+@app.route('/test-page')
+def test_page():
+    """Simple test page to verify rendering is working"""
+    logger.info("Rendering test page")
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Test Page</title>
+    </head>
+    <body>
+        <h1>Test Page</h1>
+        <p>If you can see this, the Flask app is working correctly.</p>
+        <a href="/onboarding">Go to Onboarding</a>
+    </body>
+    </html>
+    """
+
+@app.route('/onboarding')
+def onboarding():
+    """Start of the workflow - Step 1: Data Sources"""
+    # Reset workflow data when starting from scratch
+    global workflow
+    workflow = WorkflowData()
+    return render_template('onboarding/step1_data_sources.html', step=1, sources=workflow.data_sources)
+
+@app.route('/add-source', methods=['POST'])
+def add_source():
+    """Add a source to the data sources list"""
+    source_url = request.form.get('source_url', '')
+    source_type = request.form.get('source_type', 'article')
+    
+    if source_url:
+        workflow.data_sources.append({
+            'url': source_url,
+            'type': source_type,
+            'added': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
+        logger.info(f"Added source: {source_url} ({source_type})")
+    
+    return jsonify({
+        'status': 'success',
+        'sources': workflow.data_sources,
+        'count': len(workflow.data_sources)
+    })
+
+@app.route('/preview-source', methods=['POST'])
+def preview_source():
+    """Generate a preview of content from a source"""
+    source_url = request.form.get('source_url', '')
+    
+    # In a real app, this would fetch actual content
+    # For demo purposes, generate a simulated preview
+    preview = {
+        'title': f"Content from {source_url.split('//')[1] if '//' in source_url else source_url}",
+        'excerpt': f"This is a preview of the content that would be extracted from {source_url}. In a real implementation, this would contain actual extracted content from the URL.",
+        'topics': ['Topic 1', 'Topic 2', 'Topic 3'],
+        'word_count': random.randint(800, 2500),
+        'date_analyzed': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    
+    return jsonify({
+        'status': 'success',
+        'preview': preview
+    })
+
+@app.route('/step2')
+def writing_style():
+    """Step 2: Writing Style Analysis"""
+    workflow.current_step = 2
+    return render_template('onboarding/step2_writing_style.html', step=2, tone_sources=workflow.tone_sources)
+
+@app.route('/analyze-content', methods=['POST'])
+def analyze_content():
+    try:
+        content = None
+        content_type = request.form.get('type', 'text')
+        
+        logger.info(f"Analyzing content: type={content_type}")
+        
+        # Extract content based on the type
+        if content_type == 'text':
+            # Direct text input
+            content = request.form.get('content', '')
+            logger.info(f"Processing direct text input: {len(content)} characters")
+            
+        elif content_type == 'url':
+            # URL input - use QuantumToneCrawler to extract content
+            url = request.form.get('content', '')
+            logger.info(f"Processing URL: {url}")
+            
+            # Use the QuantumToneCrawler to extract content from the URL
+            try:
+                crawler = ToneCrawler()
+                content = crawler.extract_content_from_url(url)
+                logger.info(f"Extracted {len(content)} characters from URL")
+            except Exception as e:
+                logger.error(f"Error extracting content from URL: {str(e)}")
+                return jsonify({'status': 'error', 'message': f'Failed to extract content from URL: {str(e)}'})
+                
+        elif content_type == 'file':
+            # File upload
+            if 'file' not in request.files:
+                logger.error("No file part in the request")
+                return jsonify({'status': 'error', 'message': 'No file part in the request'})
+                
+            file = request.files['file']
+            if file.filename == '':
+                logger.error("No file selected")
+                return jsonify({'status': 'error', 'message': 'No file selected'})
+                
+            # Read the file content
+            try:
+                content = file.read().decode('utf-8')
+                logger.info(f"Read {len(content)} characters from uploaded file")
+            except Exception as e:
+                logger.error(f"Error reading file: {str(e)}")
+                return jsonify({'status': 'error', 'message': f'Failed to read file: {str(e)}'})
+        
+        # Check if we have valid content to analyze
+        if not content or len(content.strip()) == 0:
+            logger.error("No content to analyze")
+            return jsonify({'status': 'error', 'message': 'No content to analyze'})
+        
+        # Initialize the Neural Tone Mapper and analyze the content
+        logger.info("Initializing NeuralToneMapper")
+        mapper = NeuralToneMapper()
+        
+        # Analyze the text
+        logger.info("Analyzing text with NeuralToneMapper")
+        raw_analysis = mapper.analyze_text(content)
+        logger.info(f"Raw analysis obtained: {list(raw_analysis.keys())}")
+        
+        # Format the analysis for display
+        formatted_analysis = mapper.format_analysis_for_display(raw_analysis)
+        logger.info("Analysis formatted for display")
+        
+        # Store in workflow data
+        workflow.tone_analysis = formatted_analysis
+        
+        # Return the formatted analysis
+        return jsonify(formatted_analysis)
+        
+    except Exception as e:
+        logger.error(f"Error in tone analysis: {str(e)}")
+        return jsonify({'status': 'error', 'message': f'An error occurred during analysis: {str(e)}'})
+
+@app.route('/step3')
+def content_strategy():
+    """Step 3: Content Strategy and Scheduling"""
+    workflow.current_step = 3
+    return render_template('onboarding/step3_content_strategy.html', step=3, tone_analysis=workflow.tone_analysis)
+
+@app.route('/save-strategy', methods=['POST'])
+def save_strategy():
+    """Save the content strategy and schedule"""
+    strategy_data = request.get_json()
+    if strategy_data:
+        workflow.content_strategy = strategy_data
+        logger.info(f"Saved content strategy: {strategy_data}")
+        return jsonify({'status': 'success'})
+    return jsonify({'status': 'error', 'message': 'No strategy data provided'})
+
+@app.route('/step4')
+def generate_content():
+    """Step 4: Content Generation"""
+    workflow.current_step = 4
+    return render_template('onboarding/step4_article_generation.html', 
+                          step=4, 
+                          data_sources=workflow.data_sources,
+                          tone_analysis=workflow.tone_analysis,
+                          content_strategy=workflow.content_strategy)
+
+@app.route('/crawl-and-analyze', methods=['POST'])
+def crawl_and_analyze():
+    """
+    Step 4a: Takes the URLs from step 1 and topics from step 3
+    Uses the QuantumUniversalCrawler to extract key points from all data sources
+    """
+    if not workflow.data_sources:
+        return jsonify({'status': 'error', 'message': 'No data sources available to crawl'})
+    
+    # Get all source URLs from step 1
+    source_urls = [source['url'] for source in workflow.data_sources if source.get('url')]
+    if not source_urls:
+        return jsonify({'status': 'error', 'message': 'No valid URLs found in data sources'})
+    
+    logger.info(f"Crawling {len(source_urls)} sources")
+    
+    # Initialize the QuantumUniversalCrawler
+    try:
+        # Get the topic from the content strategy (step 3)
+        topic = ''
+        if workflow.content_strategy:
+            topic = workflow.content_strategy.get('primary_topic', '')
+        
+        if not topic:
+            return jsonify({
+                'status': 'error',
+                'message': 'No topic provided. Please set a primary topic in the content strategy first (step 3).'
+            })
+        
+        logger.info(f"Using topic for relevance filtering: {topic}")
+        
+        # Initialize and use the QuantumUniversalCrawler
+        crawler = UniversalCrawler(topic=topic, max_pages_per_domain=3)
+        
+        # Process all source URLs from step 1
+        all_crawl_data = []
+        all_key_insights = []
+        all_key_topics = set([topic])  # Start with the main topic
+        all_supporting_data = {
+            "statistics": [],
+            "case_studies": [],
+            "quotes": []
+        }
+        
+        # Crawl each URL
+        for url in source_urls[:5]:  # Limit to first 5 URLs for performance
+            try:
+                logger.info(f"Crawling source: {url}")
+                
+                # Perform the crawl with the topic for relevance filtering
+                crawl_result = crawler.crawl(url)
+                
+                # Handle the result correctly (crawl returns single result or list of results)
+                if isinstance(crawl_result, list):
+                    if not crawl_result:
+                        logger.warning(f"No content crawled from {url}")
+                        continue
+                    crawl_data = crawl_result[0]
+                else:
+                    crawl_data = crawl_result
+                    
+                # Make sure we have the content to analyze
+                if not hasattr(crawl_data, 'content') or not crawl_data.content:
+                    logger.warning(f"No content extracted from {url}")
+                    continue
+                
+                # Process the content
+                content = crawl_data.content
+                
+                # Structure the results using our utility functions
+                url_insights = extract_key_insights(crawler, content, topic)
+                url_topics = extract_topics(crawler, content, topic)
+                url_supporting_data = extract_supporting_data(crawler, content, topic)
+                
+                # Collect data from this URL
+                all_crawl_data.append({
+                    "url": url,
+                    "content": content[:3000],  # Limit content size
+                    "insights": url_insights,
+                    "confidence": getattr(crawl_data, 'confidence_score', 0.5)
+                })
+                
+                # Collect insights, avoiding duplicates
+                for insight in url_insights:
+                    if insight not in all_key_insights:
+                        all_key_insights.append(insight)
+                
+                # Collect topics, avoiding duplicates
+                for t in url_topics:
+                    all_key_topics.add(t)
+                
+                # Collect supporting data, avoiding duplicates
+                for key in url_supporting_data:
+                    for item in url_supporting_data[key]:
+                        if item not in all_supporting_data[key]:
+                            all_supporting_data[key].append(item)
+                
+                logger.info(f"Successfully crawled {url}")
+                
+            except Exception as e:
+                logger.error(f"Error crawling {url}: {str(e)}")
+                # Continue with next URL
+        
+        # Save all the crawled data to the workflow
+        workflow.crawled_data = {
+            "sources": source_urls,
+            "crawl_date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            "key_topics": list(all_key_topics),
+            "key_insights": all_key_insights[:10],  # Limit insights
+            "supporting_data": all_supporting_data,
+            "crawled_content": all_crawl_data
+        }
+        
+        logger.info(f"Crawling complete. Processed {len(all_crawl_data)} sources.")
+        logger.info(f"Found {len(all_key_insights)} key insights and {len(all_key_topics)} topics")
+        
+        return jsonify({
+            'status': 'success', 
+            'crawled_data': {
+                'source_count': len(source_urls),
+                'processed_count': len(all_crawl_data),
+                'insight_count': len(all_key_insights),
+                'topic_count': len(all_key_topics)
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error during crawling process: {str(e)}")
+        
+        # Fallback to simulated data if crawling fails completely
+        logger.warning("Using fallback simulated data due to crawling error")
+        workflow.crawled_data = {
+            "sources": source_urls,
+            "crawl_date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            "key_topics": [
+                "Content creation efficiency",
+                "AI writing assistants",
+                "Voice and tone consistency",
+                "Content strategy automation",
+                "Audience targeting"
+            ],
+            "key_insights": [
+                "Companies using AI for content creation see 3x higher output",
+                "Consistent voice across platforms increases brand recognition by 40%",
+                "Personalized content generates 18% higher engagement rates",
+                "Strategic content calendars improve team efficiency by 25%",
+                "Data-driven content decisions lead to 30% higher conversion rates"
+            ],
+            "supporting_data": {
+                "statistics": ["74% of marketers struggle with content consistency", 
+                              "AI can reduce content production time by up to 67%",
+                              "Content teams spend 33% of time on administrative tasks"],
+                "case_studies": ["How Company X increased content output by 300%",
+                               "Agency Y's content personalization strategy results"]
+            },
+            "error": str(e)
+        }
+        
+        logger.info("Using fallback crawled data")
+        return jsonify({
+            'status': 'warning', 
+            'message': f'Error during crawling: {str(e)}. Using fallback data.',
+            'crawled_data': {
+                'source_count': len(source_urls),
+                'processed_count': 0,
+                'insight_count': 5,
+                'topic_count': 5
+            }
+        })
+
+@app.route('/generate-article', methods=['POST'])
+def generate_article():
+    """
+    Step 4 (c): Combines all collected data from previous steps to create a 4000-word article
+    - Takes URLs and data from step 1 (via QuantumUniversalCrawler extraction in step 4a)
+    - Takes tone analysis from step 2 
+    - Uses topics and content strategy from step 3
+    """
+    if request.method == 'POST':
+        try:
+            # Get the article generator based on settings
+            generator_type = request.form.get('generator_type', 'auto')
+            article_generator = get_article_generator(generator_type=generator_type)
+            
+            # Generate the article
+            topic = workflow.content_strategy.get('content_focus', 'General technology')
+            style_profile = workflow.tone_analysis
+            source_material = [
+                {"content": entry, "relevance": 0.95} 
+                for entry in workflow.crawled_data.get('sections', [])
+            ]
+            
+            generated_article = article_generator.generate_article(
+                topic=topic,
+                style_profile=style_profile,
+                source_material=source_material
+            )
+            
+            workflow.generated_article = generated_article
+            
+            # Save to session
+            session['article'] = generated_article
+            session['workflow'] = workflow.__dict__
+            
+            return jsonify({
+                'success': True,
+                'message': 'Article generated successfully',
+                'article': generated_article
+            })
+            
+        except Exception as e:
+            logger.error(f"Error generating article: {str(e)}")
+            return jsonify({
+                'success': False,
+                'message': f"Error generating article: {str(e)}"
+            }), 500
+    else:
+        return redirect(url_for('generate_content'))
+
+@app.route('/article-preview')
+def article_preview():
+    """Preview the generated article"""
+    if not workflow.generated_article:
+        logger.error("No generated article found in workflow")
+        return redirect('/step4')
+    
+    # Pass article data directly to the template instead of relying on session storage
+    logger.info("Rendering article preview page with article data")
+    return render_template('article_preview.html', article_data=json.dumps(workflow.generated_article))
+
+# Error handlers
+@app.errorhandler(404)
+def page_not_found(e):
+    """Handle 404 errors"""
+    logger.error(f"404 error: {str(e)}")
+    return render_template('error.html', error=str(e), code=404), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    """Handle 500 errors"""
+    logger.error(f"Server error: {str(e)}")
+    return render_template('error.html', error=str(e), code=500), 500
+
+if __name__ == '__main__':
+    # Enable debug mode for development
+    app.debug = True
+    PORT = 8003  # Using port 8003 as requested
+    app.logger.info(f"Starting complete workflow test on port {PORT}")
+    
+    # Start the Flask application
+    app.run(host='0.0.0.0', port=PORT)

@@ -1,0 +1,59 @@
+{
+  "analysis": {
+    "cognitive_profile_analysis": {
+      "cognitive_strengths_blindspots": {
+        "items": [
+          "Strengths: Analytical, Systematic, Analogical integration",
+          "Potential Blindspots: May shift between different cognitive modes, potentially diluting focus"
+        ],
+        "title": "5. Cognitive Strengths & Blindspots"
+      },
+      "communication_framework": {
+        "items": [
+          "Domain Focus: Educational (primary content area)",
+          "Analytical-Creative Balance: 99% analytical / 1% creative",
+          "Logical-Emotional Balance: 0% logical / 100% emotional",
+          "Conceptual Network Complexity: Medium (avg sentence length: 19.2 words)"
+        ],
+        "title": "3. Communication Framework"
+      },
+      "reasoning_architecture": {
+        "items": [
+          "Analogical Reasoning: 50% (Dominant approach)",
+          "Inductive Synthesis: 25% (Merging contradictions)",
+          "Narrative Construction: 25%",
+          "Deductive Construction: 0%"
+        ],
+        "title": "2. Reasoning Architecture"
+      },
+      "style_adaptation_patterns": {
+        "items": [
+          "Key Concept Focus: 'The Evolution of Artificial Intelligence: From Rule-Based Systems to Deep Learning\n    \n    Artificial intelligence has undergone a remarkable transformation over the past few decades'",
+          "Domain Bridging: Versatile (connects concepts across different knowledge domains)",
+          "Comparative Framework: Explains concepts through meaningful parallels"
+        ],
+        "title": "4. Style Adaptation Patterns"
+      },
+      "thought_patterns": {
+        "items": [
+          "Analytical Thinking: 33% (Primary pattern)",
+          "Systematic Processing: 33% (Combining opposites)",
+          "Concrete Association: 33%",
+          "Creative Association: 0%"
+        ],
+        "title": "1. Thought Patterns"
+      },
+      "title": "Cognitive Profile Analysis"
+    },
+    "conceptual_analysis": {
+      "paragraphs": [
+        "Your cognitive style reveals a mind that primarily utilizes Analytical thinking, particularly using Analogical reasoning as a framework. This is evident in your focus on concepts like 'What began as simple rule-based expert systems has evolved into sophisticated neural networks capable of recognizing patterns, understanding natural language, and even generating creative content' and 'The Evolution of Artificial Intelligence: From Rule-Based Systems to Deep Learning\n    \n    Artificial intelligence has undergone a remarkable transformation over the past few decades'. This creates a distinctive approach in the Educational domain.",
+        "Your communication reveals a pattern of integrating Analytical and Systematic processing, where you combine seemingly different cognitive approaches to create a unique synthesis. This is reflected in your 99% analytical to 1% creative balance.",
+        "This cognitive architecture supports your strengths in Analytical, Systematic, Analogical, while maintaining a complexity level that is medium (average sentence length: 19.2 words)."
+      ],
+      "title": "Conceptual Analysis"
+    },
+    "heading": "Neural Tone Mapper Analysis"
+  },
+  "status": "success"
+}
