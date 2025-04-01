@@ -1,45 +1,57 @@
-# SocialMe
+# SocialMe Content Generation Workflow
 
-SocialMe is an AI-powered content creation platform that helps users generate high-quality articles based on data sources, writing style analysis, and content strategy.
+## Project Overview
+SocialMe is an advanced AI-powered content generation platform designed to create high-quality, contextually relevant articles using sophisticated NLP techniques.
 
-## Application Structure
+## Key Features
+- Comprehensive content generation workflow
+- Advanced topic and tone analysis
+- Flexible source input methods
+- Modular API-driven architecture
 
-The SocialMe application follows a standardized architecture:
+## Prerequisites
+- Python 3.8+
+- Dependencies listed in `requirements.txt`
 
-### Core Components
+## Installation
+1. Clone the repository
+2. Create a virtual environment
+```bash
+python3 -m venv myenv
+source myenv/bin/activate
+```
 
-- **app.py**: Main application entry point
-- **app/**: Core application modules
-  - **crawlers/**: Standardized web crawling implementations
-  - **generators/**: Content generation modules
-  - **routes/**: API and web route handlers
-  - **models/**: Database models
-  - **services/**: Business logic services
-  - **utils/**: Helper utilities
-  - **core/**: Core functionality
+3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-### Templates
+## Running the Application
+```bash
+python app.py
+```
 
-- **templates/**: Web UI templates
-  - **articles/**: Article-related templates
-  - **auth/**: Authentication templates
-  - **content/**: Content creation templates
-  - **layout/**: Layout templates (base templates, etc.)
-  - **components/**: Reusable UI components
-  - **onboarding/**: User onboarding workflow templates
+## Testing
+```bash
+pytest tests/
+```
 
-### Static Assets
+## Key Components
+- Universal Quantum Crawler
+- Advanced Tone Analysis
+- Article Generation Pipeline
+- Workflow Management API
 
-- **static/**: Web assets
-  - **css/**: Stylesheet files
-  - **js/**: JavaScript files
-  - **images/**: Image files
+## Known Limitations
+- Tone analysis may be basic without full dependencies
+- Article generation quality depends on input sources
 
-## Key Workflows
+## Contributing
+Please read `NOTES.md` for development insights and contribution guidelines.
 
-### Article Generation Workflow
+## License
+[To be added]
 
-1. **Step 1: Content Sources** - User inputs text, documents, or URLs as sources for key datapoints
-2. **Step 2: Writing Style Analysis** - User provides sources for tone analysis
-3. **Step 3: Content Strategy** - User defines topics, target audience, and content strategy
-4. **Step 4: Article Generation** - System generates a 4000-word article using crawled content and user inputs
+## Contact
+Developer: SocialMe Team
+Email: developer@socialme.ai
