@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SocialMe - Content Strategy</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --background-color: #ffffff;
+      --text-color: #333333;
+      --accent-color: #4a86e8;
+      --border-color: #e0e0e0;
+      --card-background: #f5f5f5;
+      --button-background: #f0f0f0;
+      --button-hover: #e0e0e0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .step-indicator {
+      text-align: right;
+      color: var(--accent-color);
+      margin-bottom: 20px;
+      font-size: 0.9em;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: var(--text-color);
+      font-weight: 600;
+    }
+
+    .strategy-form {
+      margin-top: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group h2 {
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .form-group p {
+      margin-bottom: 15px;
+      color: #666;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1em;
+      resize: vertical;
+    }
+
+    .word-count {
+      text-align: right;
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .frequency-options {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .frequency-option {
+      flex: 1;
+      padding: 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .frequency-option:hover {
+      background-color: var(--button-hover);
+    }
+
+    .frequency-option.selected {
+      border-color: var(--accent-color);
+      background-color: rgba(74, 134, 232, 0.1);
+    }
+
+    .frequency-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .frequency-desc {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .nav-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: var(--button-background);
+      color: var(--text-color);
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .nav-button:hover {
+      background-color: var(--button-hover);
+    }
+
+    .nav-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .nav-button#nextBtn {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    .nav-button#nextBtn:hover {
+      background-color: #3a76d8;
+    }
+
+    .examples-link {
+      color: var(--accent-color);
+      text-decoration: underline;
+      cursor: pointer;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .examples-link:hover {
+      text-decoration: none;
+    }
+
+    .example-buttons {
+      margin-top: 20px;
+    }
+
+    .sample-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: var(--button-background);
+      color: var(--text-color);
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin: 5px;
+    }
+
+    .sample-button:hover {
+      background-color: var(--button-hover);
+    }
+
+    /* New styles for topic fields */
+    .topic-fields {
+      margin-bottom: 25px;
+    }
+    
+    .primary-topic, .secondary-topics {
+      margin-bottom: 15px;
+    }
+    
+    .field-hint {
+      font-size: 0.8em;
+      color: #777;
+      margin-top: 5px;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1em;
+    }
+    
+    .content-settings {
+      margin: 20px 0;
+    }
+    
+    .field-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .field-row label {
+      width: 120px;
+      margin-right: 10px;
+    }
+    
+    select {
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1em;
+      width: 250px;
+    }
+    
+    .small-button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: var(--accent-color);
+      color: white;
+      font-size: 0.9em;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    
+    #secondary_topics_list {
+      margin-top: 10px;
+    }
+    
+    .topic-tag {
+      display: inline-block;
+      background-color: #e8f0fe;
+      color: #4a86e8;
+      padding: 5px 10px;
+      border-radius: 15px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      font-size: 0.9em;
+    }
+    
+    .topic-tag .remove-topic {
+      margin-left: 5px;
+      cursor: pointer;
+      color: #4a86e8;
+    }
+    
+    /* Switch styling for the advanced generator option */
+    .advanced-generator-option {
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #f8f8f8;
+      border-radius: 8px;
+    }
+    
+    .switch-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      margin-right: 10px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+    }
+    
+    input:checked + .slider {
+      background-color: #4a86e8;
+    }
+    
+    input:focus + .slider {
+      box-shadow: 0 0 1px #4a86e8;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .slider.round {
+      border-radius: 34px;
+    }
+    
+    .slider.round:before {
+      border-radius: 50%;
+    }
+    
+    .switch-label {
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="step-indicator">Step 3 of 4</div>
+    
+    <h1>Content Strategy</h1>
+    
+    <div class="strategy-form">
+      <form id="strategyForm" method="post" action="/save_strategy">
+        <div class="form-group">
+          <h2>What's your content strategy and direction?</h2>
+          <p>Describe your content goals, target audience, key messages, and ideas you want to propagate</p>
+          <a class="examples-link" id="showExamples">Show examples</a>
+          
+          <div class="topic-fields">
+            <div class="primary-topic">
+              <label for="primary_topic">Primary Topic:</label>
+              <input type="text" id="primary_topic" name="primary_topic" placeholder="E.g., Artificial Intelligence, Content Marketing, Leadership" required>
+              <p class="field-hint">This will be the main focus of your generated article</p>
+            </div>
+            
+            <div class="secondary-topics">
+              <label for="secondary_topics">Secondary Topics (optional):</label>
+              <input type="text" id="secondary_topics" name="secondary_topics" placeholder="E.g., Innovation, Strategy, Technology">
+              <button type="button" id="addSecondaryTopic" class="small-button">+ Add</button>
+              <div id="secondary_topics_list"></div>
+              <p class="field-hint">These will support your primary topic in the generated article</p>
+            </div>
+          </div>
+          
+          <div class="content-settings">
+            <div class="field-row">
+              <label for="content_type">Content Type:</label>
+              <select id="content_type" name="content_type">
+                <option value="blog">Blog Post</option>
+                <option value="article">Long-form Article</option>
+                <option value="whitepaper">White Paper</option>
+                <option value="newsletter">Newsletter</option>
+                <option value="case_study">Case Study</option>
+              </select>
+            </div>
+            
+            <div class="field-row">
+              <label for="content_focus">Content Focus:</label>
+              <select id="content_focus" name="content_focus">
+                <option value="educational">Educational</option>
+                <option value="persuasive">Persuasive</option>
+                <option value="thought_leadership">Thought Leadership</option>
+                <option value="analytical">Analytical</option>
+                <option value="storytelling">Storytelling</option>
+              </select>
+            </div>
+          </div>
+          
+          <h3>Publishing Schedule</h3>
+          <div class="frequency-options">
+            <div class="frequency-option" data-value="daily">
+              <div class="frequency-title">Daily</div>
+              <div class="frequency-desc">Short-form content published every day</div>
+            </div>
+            <div class="frequency-option" data-value="weekly">
+              <div class="frequency-title">Weekly</div>
+              <div class="frequency-desc">Medium-form content released weekly</div>
+            </div>
+            <div class="frequency-option" data-value="monthly">
+              <div class="frequency-title">Monthly</div>
+              <div class="frequency-desc">In-depth content published monthly</div>
+            </div>
+          </div>
+          <input type="hidden" id="publishing_schedule" name="publishing_schedule" value="weekly">
+        </div>
+        
+        <div class="form-group advanced-generator-option">
+          <h3>Article Generation</h3>
+          <div class="switch-container">
+            <label class="switch">
+              <input type="checkbox" id="use_advanced_generator" name="use_advanced_generator" checked>
+              <span class="slider round"></span>
+            </label>
+            <span class="switch-label">Use Advanced Article Generator (Claude-powered)</span>
+          </div>
+          <p class="field-hint">The advanced generator creates comprehensive, well-researched articles by analyzing your sources and writing style</p>
+        </div>
+
+        <div class="button-row">
+          <button type="button" class="nav-button" id="backBtn" onclick="window.location.href='/writing_style'">Back</button>
+          <button type="submit" class="nav-button" id="nextBtn">Next</button>
+        </div>
+      </form>
+        
+      <div id="examplesContainer" style="display: none;">
+        <h3>Examples</h3>
+        <div class="example-buttons">
+          <button id="sample1" class="sample-button">Tech Company Blog Strategy</button>
+          <button id="sample2" class="sample-button">Personal Branding Strategy</button>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // DOM elements
+      const strategyForm = document.getElementById('strategyForm');
+      const primaryTopic = document.getElementById('primary_topic');
+      const secondaryTopics = document.getElementById('secondary_topics');
+      const addSecondaryTopic = document.getElementById('addSecondaryTopic');
+      const secondaryTopicsList = document.getElementById('secondary_topics_list');
+      const publishingSchedule = document.getElementById('publishing_schedule');
+      const nextBtn = document.getElementById('nextBtn');
+      
+      // Publishing frequency selection
+      document.querySelectorAll('.frequency-option').forEach(option => {
+        option.addEventListener('click', function() {
+          document.querySelectorAll('.frequency-option').forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          publishingSchedule.value = this.dataset.value;
+        });
+      });
+      
+      // Default select weekly
+      document.querySelector('.frequency-option[data-value="weekly"]').classList.add('selected');
+      
+      // Secondary topics functionality
+      addSecondaryTopic.addEventListener('click', function() {
+        const topic = secondaryTopics.value.trim();
+        if (topic) {
+          addTopicTag(topic);
+          secondaryTopics.value = '';
+        }
+      });
+      
+      secondaryTopics.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addSecondaryTopic.click();
+        }
+      });
+      
+      function addTopicTag(topic) {
+        const tag = document.createElement('span');
+        tag.className = 'topic-tag';
+        tag.innerHTML = `${topic} <span class="remove-topic">&times;</span>`;
+        
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'secondary_topics';
+        hiddenInput.value = topic;
+        
+        tag.appendChild(hiddenInput);
+        secondaryTopicsList.appendChild(tag);
+        
+        tag.querySelector('.remove-topic').addEventListener('click', function() {
+          secondaryTopicsList.removeChild(tag);
+        });
+      }
+      
+      // Form validation
+      function checkFormValidity() {
+        if (primaryTopic.value.trim()) {
+          nextBtn.disabled = false;
+        } else {
+          nextBtn.disabled = true;
+        }
+      }
+      
+      primaryTopic.addEventListener('input', checkFormValidity);
+      checkFormValidity();
+      
+      // Examples handling
+      const techBlogSample = "Our company blog focuses on AI-powered content creation tools and strategies for marketing teams. The target audience is marketing professionals and content strategists looking to scale their content operations. We want to position ourselves as thought leaders in content automation while providing practical, implementable advice.";
+      
+      const personalBrandingSample = "I'm building a personal brand around leadership in tech startups. My content will focus on lessons learned from founding and scaling software companies, with an emphasis on building strong engineering teams. The audience is primarily aspiring tech entrepreneurs and engineering leaders.";
+      
+      document.getElementById('showExamples').addEventListener('click', function() {
+        const examplesContainer = document.getElementById('examplesContainer');
+        if (examplesContainer.style.display === 'none') {
+          examplesContainer.style.display = 'block';
+          this.textContent = 'Hide examples';
+        } else {
+          examplesContainer.style.display = 'none';
+          this.textContent = 'Show examples';
+        }
+      });
+      
+      document.getElementById('sample1').addEventListener('click', function() {
+        primaryTopic.value = "AI-powered Content Creation";
+        addTopicTag("Content Automation");
+        addTopicTag("Marketing Strategy");
+        checkFormValidity();
+      });
+      
+      document.getElementById('sample2').addEventListener('click', function() {
+        primaryTopic.value = "Leadership in Tech Startups";
+        addTopicTag("Engineering Teams");
+        addTopicTag("Entrepreneurship");
+        checkFormValidity();
+      });
+    </script>
+  </div>
+</body>
+</html>

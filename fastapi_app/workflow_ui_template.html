@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialMe Article Generator</title>
+    <style>
+        :root {
+            --primary-color: #d4af37; /* Gold accent color */
+            --dark-bg: #1e1e1e;
+            --darker-bg: #111111;
+            --light-text: #f5f5f5;
+            --muted-text: #aaaaaa;
+            --border-color: #333333;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --info-color: #2196f3;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            margin-top: 0;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        /* Steps Navigation */
+        .steps-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+            padding: 0 40px;
+        }
+        
+        .steps-nav::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 50px;
+            right: 50px;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+        
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--darker-bg);
+            border: 2px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .step-label {
+            font-size: 14px;
+            color: var(--muted-text);
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active .step-circle {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--darker-bg);
+        }
+        
+        .step-indicator.active .step-label {
+            color: var(--primary-color);
+        }
+        
+        .step-indicator.completed .step-circle {
+            background-color: var(--border-color);
+            border-color: var(--border-color);
+        }
+        
+        /* Step Content */
+        .step-content {
+            background-color: var(--darker-bg);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Form Elements */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--light-text);
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .required {
+            color: var(--primary-color);
+            margin-left: 3px;
+        }
+        
+        .field-description {
+            font-size: 14px;
+            color: var(--muted-text);
+            margin-bottom: 10px;
+        }
+        
+        /* Buttons */
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button.primary {
+            background-color: var(--primary-color);
+            color: var(--darker-bg);
+        }
+        
+        button.primary:hover {
+            background-color: #c4a42f;
+        }
+        
+        button.secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--light-text);
+        }
+        
+        button.secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Source Items */
+        .source-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--dark-bg);
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .source-content {
+            flex-grow: 1;
+            word-break: break-all;
+        }
+        
+        .remove-btn {
+            margin-left: 10px;
+            color: var(--muted-text);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 5px;
+            transition: color 0.3s ease;
+        }
+        
+        .remove-btn:hover {
+            color: var(--error-color);
+        }
+        
+        /* Status Messages */
+        .status-message {
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            display: none;
+        }
+        
+        .status-message.success {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid var(--success-color);
+            color: var(--success-color);
+        }
+        
+        .status-message.error {
+            background-color: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid var(--error-color);
+            color: var(--error-color);
+        }
+        
+        .status-message.info {
+            background-color: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid var(--info-color);
+            color: var(--info-color);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--light-text);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Article Preview */
+        .article-preview {
+            background-color: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .steps-nav {
+                overflow-x: auto;
+                padding-bottom: 15px;
+                justify-content: flex-start;
+                gap: 40px;
+            }
+            
+            .steps-nav::before {
+                left: 0;
+                right: 0;
+            }
+            
+            .step-indicator {
+                flex-shrink: 0;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SocialMe Article Generator</h1>
+        
+        <!-- Steps Navigation -->
+        <div class="steps-nav">
+            <div class="step-indicator active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Topic</div>
+            </div>
+            <div class="step-indicator" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Content Sources</div>
+            </div>
+            <div class="step-indicator" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Writing Style</div>
+            </div>
+            <div class="step-indicator" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Generate Article</div>
+            </div>
+            <div class="step-indicator" data-step="5">
+                <div class="step-circle">5</div>
+                <div class="step-label">Validate</div>
+            </div>
+        </div>
+        
+        <!-- Status Message -->
+        <div id="status-message" class="status-message"></div>
+        
+        <!-- Step 1: Topic -->
+        <div id="step-1" class="step-content active">
+            <h2>What is your primary topic?</h2>
+            
+            <label for="primary-topic">Primary Topic <span class="required">*</span></label>
+            <input type="text" id="primary-topic" placeholder="e.g. the future of AI in content creation" required>
+            <div class="field-description">This will be the main focus of your generated content</div>
+            
+            <label for="secondary-topics">Secondary topics or keywords (optional)</label>
+            <textarea id="secondary-topics" placeholder="e.g. machine learning, content strategy, productivity"></textarea>
+            <div class="field-description">Add related topics or keywords to include in your content</div>
+            
+            <div class="button-group">
+                <button id="topic-next" class="primary">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Content Sources -->
+        <div id="step-2" class="step-content">
+            <h2>Add Content Sources</h2>
+            
+            <label for="source-url">Source URL</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="source-url" placeholder="https://example.com/article" style="margin-bottom: 0;">
+                <button id="add-source" class="primary" style="width: 100px; flex-shrink: 0;">Add</button>
+            </div>
+            
+            <label>Your Sources</label>
+            <div id="source-list" style="margin-bottom: 20px;">
+                <!-- Source items will be added here dynamically -->
+                <div class="field-description" id="no-sources-message">No sources added yet. Add at least one source to continue.</div>
+            </div>
+            
+            <div class="button-group">
+                <button id="sources-prev" class="secondary">Back</button>
+                <button id="sources-next" class="primary">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Writing Style -->
+        <div id="step-3" class="step-content">
+            <h2>Define Your Writing Style</h2>
+            
+            <label for="tone-sample">Sample Text for Tone Analysis</label>
+            <textarea id="tone-sample">AI is revolutionizing content creation through advanced language models that can generate human-like text. These systems analyze patterns and context to produce relevant content for various purposes, from marketing materials to technical documentation.</textarea>
+            <div class="field-description">Provide a sample of writing that represents your desired tone and style</div>
+            
+            <div class="button-group">
+                <button id="style-prev" class="secondary">Back</button>
+                <button id="style-next" class="primary">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Step 4: Generate Article -->
+        <div id="step-4" class="step-content">
+            <h2>Generate Your Article</h2>
+            
+            <div style="margin-bottom: 30px;">
+                <p>We'll now generate your article based on:</p>
+                <ul>
+                    <li><strong>Topic:</strong> <span id="summary-topic"></span></li>
+                    <li><strong>Sources:</strong> <span id="summary-sources-count">0</span> sources added</li>
+                    <li><strong>Writing Style:</strong> Based on your provided sample</li>
+                </ul>
+            </div>
+            
+            <div id="generation-status" style="display: none; margin-bottom: 20px;">
+                <div class="spinner"></div>
+                <span id="generation-message">Generating your article...</span>
+            </div>
+            
+            <div class="button-group">
+                <button id="generate-prev" class="secondary">Back</button>
+                <button id="generate-btn" class="primary">Generate Article</button>
+                <button id="view-article" class="primary" style="display: none;">View Article</button>
+            </div>
+        </div>
+        
+        <!-- Step 5: Validate -->
+        <div id="step-5" class="step-content">
+            <h2>Review Your Article</h2>
+            
+            <label for="article-content">Article Content</label>
+            <textarea id="article-content" style="height: 400px;"></textarea>
+            
+            <div class="button-group">
+                <button id="validate-prev" class="secondary">Back</button>
+                <button id="save-edits" class="secondary">Save Edits</button>
+                <button id="approve-article" class="primary">Approve & Download</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // API Configuration
+        const API = { baseUrl: '/api' };
+        let workflowId = null;
+        let sources = [];
+        
+        // Enable for detailed debugging
+        const enableDebug = true;
+        
+        function logDebug(message, data) {
+            if (enableDebug) {
+                console.log(`[DEBUG] ${message}`, data || '');
+            }
+        }
+        
+        // DOM Elements
+        const stepIndicators = document.querySelectorAll('.step-indicator');
+        const stepContents = document.querySelectorAll('.step-content');
+        const statusMessage = document.getElementById('status-message');
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            checkApiHealth();
+        });
+        
+        // Navigation Functions
+        function goToStep(stepNumber) {
+            // Update step indicators
+            stepIndicators.forEach(indicator => {
+                const step = parseInt(indicator.dataset.step);
+                
+                if (step < stepNumber) {
+                    indicator.classList.remove('active');
+                    indicator.classList.add('completed');
+                } else if (step === stepNumber) {
+                    indicator.classList.add('active');
+                    indicator.classList.remove('completed');
+                } else {
+                    indicator.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Update step content visibility
+            stepContents.forEach((content, index) => {
+                if (index + 1 === stepNumber) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Update summary information for step 4
+            if (stepNumber === 4) {
+                updateSummary();
+            }
+        }
+        
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Step 1: Topic
+            document.getElementById('topic-next').addEventListener('click', async () => {
+                const primaryTopic = document.getElementById('primary-topic').value;
+                
+                if (!primaryTopic) {
+                    showStatus('Please enter a primary topic', 'error');
+                    return;
+                }
+                
+                showStatus('Starting workflow...', 'info');
+                
+                try {
+                    const response = await fetch(`${API.baseUrl}/workflow/start`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            topic: primaryTopic, 
+                            title: `Article about ${primaryTopic}`,
+                            secondary_topics: document.getElementById('secondary-topics').value
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        workflowId = data.workflow_id;
+                        // Debug the workflowId
+                        logDebug('Workflow ID after start:', workflowId);
+                        localStorage.setItem('currentWorkflowId', workflowId);
+                        showStatus('Workflow started successfully', 'success');
+                        goToStep(2);
+                    } else {
+                        const errorData = await response.json();
+                        showStatus(`Failed to start workflow: ${errorData.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error');
+                }
+            });
+            
+            // Step 2: Content Sources
+            document.getElementById('add-source').addEventListener('click', () => {
+                const sourceUrl = document.getElementById('source-url').value;
+                
+                if (!sourceUrl) {
+                    showStatus('Please enter a valid URL', 'error');
+                    return;
+                }
+                
+                if (!isValidUrl(sourceUrl)) {
+                    showStatus('Please enter a valid URL format', 'error');
+                    return;
+                }
+                
+                addSource(sourceUrl);
+                document.getElementById('source-url').value = '';
+            });
+            
+            document.getElementById('sources-prev').addEventListener('click', () => {
+                goToStep(1);
+            });
+            
+            document.getElementById('sources-next').addEventListener('click', async () => {
+                if (sources.length === 0) {
+                    showStatus('Please add at least one source', 'error');
+                    return;
+                }
+                
+                showStatus('Processing sources...', 'info');
+                
+                try {
+                    const response = await fetch(`${API.baseUrl}/workflow/${workflowId}/data/sources`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ urls: sources })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        showStatus(`Sources processed successfully. Found ${data.total_word_count} words.`, 'success');
+                        goToStep(3);
+                    } else {
+                        const errorData = await response.json();
+                        showStatus(`Failed to process sources: ${errorData.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error');
+                }
+            });
+            
+            // Step 3: Writing Style
+            document.getElementById('style-prev').addEventListener('click', () => {
+                goToStep(2);
+            });
+            
+            document.getElementById('style-next').addEventListener('click', async () => {
+                const toneSample = document.getElementById('tone-sample').value;
+                
+                if (!toneSample) {
+                    showStatus('Please provide a sample for tone analysis', 'error');
+                    return;
+                }
+                
+                showStatus('Analyzing writing style...', 'info');
+                
+                try {
+                    const response = await fetch(`${API.baseUrl}/workflow/${workflowId}/tone-analysis`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sample_text: toneSample })
+                    });
+                    
+                    if (response.ok) {
+                        showStatus('Writing style analyzed successfully', 'success');
+                        goToStep(4);
+                    } else {
+                        const errorData = await response.json();
+                        showStatus(`Failed to analyze writing style: ${errorData.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error');
+                }
+            });
+            
+            // Step 4: Generate Article
+            document.getElementById('generate-prev').addEventListener('click', () => {
+                goToStep(3);
+            });
+            
+            document.getElementById('generate-btn').addEventListener('click', async () => {
+                document.getElementById('generate-btn').disabled = true;
+                document.getElementById('generation-status').style.display = 'block';
+                document.getElementById('generation-message').textContent = 'Generating your article... (this may take a few minutes)';
+                
+                showStatus('Generating article...', 'info');
+                
+                try {
+                    const response = await fetch(`${API.baseUrl}/workflow/${workflowId}/article/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            settings: {
+                                target_word_count: 2000, // Default word count
+                                tone: 'informative'
+                            }
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        document.getElementById('generation-message').textContent = 'Article generated successfully!';
+                        document.getElementById('view-article').style.display = 'inline-block';
+                        showStatus('Article generated successfully', 'success');
+                    } else {
+                        document.getElementById('generate-btn').disabled = false;
+                        document.getElementById('generation-status').style.display = 'none';
+                        
+                        const errorData = await response.json();
+                        showStatus(`Failed to generate article: ${errorData.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (error) {
+                    document.getElementById('generate-btn').disabled = false;
+                    document.getElementById('generation-status').style.display = 'none';
+                    showStatus(`Error: ${error.message}`, 'error');
+                }
+            });
+            
+            document.getElementById('view-article').addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`${API.baseUrl}/workflow/${workflowId}/article`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('article-content').value = data.article.content;
+                        goToStep(5);
+                    } else {
+                        const errorData = await response.json();
+                        showStatus(`Failed to retrieve article: ${errorData.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error');
+                }
+            });
+            
+            // Step 5: Validate
+            document.getElementById('validate-prev').addEventListener('click', () => {
+                goToStep(4);
+            });
+            
+            document.getElementById('save-edits').addEventListener('click', async () => {
+                const content = document.getElementById('article-content').value;
+                
+                if (!content) {
+                    showStatus('Article content cannot be empty', 'error');
+                    return;
+                }
+                
+                // Verify we have a workflow ID
+                if (!workflowId) {
+                    // Try to recover from localStorage
+                    workflowId = localStorage.getItem('currentWorkflowId');
+                    if (!workflowId) {
+                        showStatus('No active workflow found. Please start a new workflow.', 'error');
+                        return;
+                    }
+                }
+                
+                logDebug('Saving edits with workflow ID:', workflowId);
+                showStatus('Saving edits...', 'info');
+                
+                try {
+                    const response = await fetch(`${API.baseUrl}/workflow/${workflowId}/article/edit`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            content: content,
+                            version_name: 'User Edit'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        showStatus('Edits saved successfully', 'success');
+                    } else {
+                        const errorData = await response.json();
+                        showStatus(`Failed to save edits: ${errorData.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error');
+                }
+            });
+            
+            document.getElementById('approve-article').addEventListener('click', async () => {
+                // Verify we have a workflow ID
+                if (!workflowId) {
+                    // Try to recover from localStorage
+                    workflowId = localStorage.getItem('currentWorkflowId');
+                    if (!workflowId) {
+                        showStatus('No active workflow found. Please start a new workflow.', 'error');
+                        return;
+                    }
+                }
+                
+                logDebug('Approving article with workflow ID:', workflowId);
+                showStatus('Approving article...', 'info');
+                
+                try {
+                    const approveResponse = await fetch(`${API.baseUrl}/workflow/${workflowId}/article/approve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            approved: true,
+                            publish: true
+                        })
+                    });
+                    
+                    if (approveResponse.ok) {
+                        showStatus('Article approved. Preparing download...', 'success');
+                        
+                        // Download the article
+                        const downloadUrl = `${API.baseUrl}/workflow/${workflowId}/article/download?format=markdown`;
+                        logDebug('Download URL:', downloadUrl);
+                        
+                        // Show the download URL in the UI for debugging
+                        const debugInfo = document.createElement('div');
+                        debugInfo.innerHTML = `<p>Download URL: <a href="${downloadUrl}" target="_blank">${downloadUrl}</a></p>`;
+                        document.querySelector('.button-group').appendChild(debugInfo);
+                        
+                        // Try to open the download
+                        window.open(downloadUrl);
+                    } else {
+                        const errorData = await approveResponse.json();
+                        showStatus(`Failed to approve article: ${errorData.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`Error: ${error.message}`, 'error');
+                }
+            });
+        }
+        
+        // Helper Functions
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        function addSource(url) {
+            if (sources.includes(url)) {
+                showStatus('This source has already been added', 'error');
+                return;
+            }
+            
+            sources.push(url);
+            updateSourceList();
+            document.getElementById('no-sources-message').style.display = 'none';
+            showStatus('Source added successfully', 'success');
+        }
+        
+        function removeSource(url) {
+            const index = sources.indexOf(url);
+            if (index !== -1) {
+                sources.splice(index, 1);
+                updateSourceList();
+                
+                if (sources.length === 0) {
+                    document.getElementById('no-sources-message').style.display = 'block';
+                }
+                
+                showStatus('Source removed', 'info');
+            }
+        }
+        
+        function updateSourceList() {
+            const sourceList = document.getElementById('source-list');
+            
+            // Clear existing items except the no-sources message
+            Array.from(sourceList.children).forEach(child => {
+                if (!child.id || child.id !== 'no-sources-message') {
+                    sourceList.removeChild(child);
+                }
+            });
+            
+            // Add source items
+            sources.forEach(url => {
+                const sourceItem = document.createElement('div');
+                sourceItem.className = 'source-item';
+                
+                const sourceContent = document.createElement('div');
+                sourceContent.className = 'source-content';
+                sourceContent.textContent = url;
+                
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-btn';
+                removeButton.innerHTML = '&times;';
+                removeButton.addEventListener('click', () => removeSource(url));
+                
+                sourceItem.appendChild(sourceContent);
+                sourceItem.appendChild(removeButton);
+                sourceList.insertBefore(sourceItem, document.getElementById('no-sources-message'));
+            });
+        }
+        
+        function updateSummary() {
+            document.getElementById('summary-topic').textContent = document.getElementById('primary-topic').value;
+            document.getElementById('summary-sources-count').textContent = sources.length;
+        }
+        
+        function isValidUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        function checkApiHealth() {
+            fetch(`${API.baseUrl}/workflow/health`)
+                .then(response => {
+                    if (response.ok) {
+                        showStatus('Connected to API successfully', 'success');
+                    } else {
+                        showStatus('API health check failed. Some features may not work correctly.', 'error');
+                    }
+                })
+                .catch(error => {
+                    showStatus(`API connection error: ${error.message}. Please refresh the page and try again.`, 'error');
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialMe - Content Analysis Results</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e4e4e4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00BFA5;
+        }
+        .step-indicator {
+            float: right;
+            background-color: #2d2d2d;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .main-content {
+            padding: 30px 0;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #00BFA5;
+        }
+        .stat-box {
+            display: inline-block;
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-right: 20px;
+            margin-bottom: 20px;
+            min-width: 150px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #a0a0a0;
+        }
+        .top-words {
+            margin-top: 20px;
+        }
+        .word-item {
+            display: inline-block;
+            background-color: #2d2d2d;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .content-preview {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .navigation {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            background-color: #00BFA5;
+            color: #121212;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #00a895;
+        }
+        button.secondary {
+            background-color: #2d2d2d;
+            color: #e4e4e4;
+        }
+        button.secondary:hover {
+            background-color: #3d3d3d;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            color: #a0a0a0;
+            border-top: 1px solid #2d2d2d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <span class="logo">SocialMe</span>
+            <span class="step-indicator">Step 1 of 4</span>
+        </div>
+    </header>
+    
+    <div class="container main-content">
+        <div class="card">
+            <h1>Content Analysis Results</h1>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value">{{ word_count }}</div>
+                    <div class="stat-label">Word Count</div>
+                </div>
+                
+                <div class="stat-box">
+                    <div class="stat-value">{{ "%.2f"|format(avg_word_length) }}</div>
+                    <div class="stat-label">Avg Word Length</div>
+                </div>
+            </div>
+            
+            <div class="top-words">
+                <h3>Top Words</h3>
+                {% for word, count in top_words %}
+                    <span class="word-item">{{ word }} ({{ count }})</span>
+                {% endfor %}
+            </div>
+            
+            <div class="content-preview">
+                <h3>Content Preview</h3>
+                <p>{{ text[:500] }}{% if text|length > 500 %}...{% endif %}</p>
+            </div>
+            
+            <div class="navigation">
+                <a href="/"><button class="secondary">Add Another Source</button></a>
+                <button onclick="window.location.href='/writing-style'">Next: Writing Style</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="container">
+        <p>© 2025 SocialMe - AI-powered social media management</p>
+    </footer>
+</body>
+</html>

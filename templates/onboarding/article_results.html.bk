@@ -1,0 +1,1261 @@
+{% extends "base.html" %}
+{% block title %}Generated Article - SocialMe{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  
+  <style>
+    /* Core Variables */
+    :root {
+      --background-color: #121212;
+      --panel-background: #1e1e1e;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --accent-color: #4a86e8;
+      --accent-hover: #3a76d8;
+      --success-color: #4caf50;
+      --border-color: #333333;
+      --separator-color: #2a2a2a;
+      --card-background: #252525;
+      --button-background: #333333;
+      --button-hover: #444444;
+      --shadow-color: rgba(0, 0, 0, 0.5);
+      --tooltip-background: #424242;
+      --highlight-color: rgba(74, 134, 232, 0.15);
+    }
+
+    /* Reset & Base Styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--background-color);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Layout & Structure */
+    .app-container {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .article-panel {
+      position: relative;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) var(--panel-background);
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .article-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .article-panel::-webkit-scrollbar-track {
+      background: var(--panel-background);
+    }
+
+    .article-panel::-webkit-scrollbar-thumb {
+      background-color: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .info-panel {
+      background: var(--panel-background);
+      border-left: 1px solid var(--separator-color);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) var(--panel-background);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .info-panel::-webkit-scrollbar-track {
+      background: var(--panel-background);
+    }
+
+    .info-panel::-webkit-scrollbar-thumb {
+      background-color: var(--border-color);
+      border-radius: 4px;
+    }
+
+    /* Header Styles */
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 25px 15px;
+      background: var(--panel-background);
+      border-bottom: 1px solid var(--separator-color);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .article-header-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .header-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    .action-button {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .action-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Article Content */
+    .article-content-wrapper {
+      padding: 30px 25px 100px;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
+
+    .article-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .article-subtitle {
+      font-size: 1.4rem;
+      font-weight: 500;
+      margin-bottom: 25px;
+      color: var(--text-secondary);
+    }
+
+    .article-body {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text-primary);
+    }
+
+    .article-body p {
+      margin-bottom: 20px;
+    }
+
+    .article-body h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-top: 35px;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .article-body ul {
+      margin-bottom: 25px;
+      padding-left: 20px;
+    }
+
+    .article-body li {
+      margin-bottom: 10px;
+    }
+
+    .article-body li:last-child {
+      margin-bottom: 0;
+    }
+
+    .article-conclusion {
+      margin-top: 35px;
+      padding-top: 25px;
+      border-top: 1px solid var(--separator-color);
+      font-style: italic;
+    }
+
+    /* Info Panel Content */
+    .info-section {
+      padding: 25px;
+      border-bottom: 1px solid var(--separator-color);
+    }
+
+    .info-section:last-child {
+      border-bottom: none;
+    }
+
+    .info-section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--text-primary);
+    }
+
+    .info-section-content {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .info-item {
+      margin-bottom: 15px;
+    }
+
+    .info-item-label {
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .info-item-value {
+      color: var(--text-secondary);
+    }
+
+    .insight-item {
+      display: flex;
+      margin-bottom: 15px;
+    }
+
+    .insight-bullet {
+      color: var(--accent-color);
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    /* Floating Action Bar */
+    .action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 380px;
+      background: rgba(30, 30, 30, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid var(--separator-color);
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .action-bar-section {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .article-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--success-color);
+      font-size: 0.9rem;
+    }
+
+    .status-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .action-button-primary {
+      padding: 10px 20px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-button-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .action-button-secondary {
+      padding: 10px 20px;
+      background-color: var(--button-background);
+      color: var(--text-primary);
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-button-secondary:hover {
+      background-color: var(--button-hover);
+    }
+
+    /* Reading Preferences Controls */
+    .reading-preferences {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 20px;
+      padding: 15px;
+      background: var(--card-background);
+      border-radius: 8px;
+    }
+
+    .preference-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preference-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .dropdown-select {
+      padding: 6px 10px;
+      background: var(--button-background);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* Font Size Controls */
+    .font-size-controls {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .font-button {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--button-background);
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .font-button:hover {
+      background: var(--button-hover);
+    }
+
+    /* Progress Indicator */
+    .progress-container {
+      width: 100%;
+      background-color: var(--border-color);
+      height: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background-color: var(--accent-color);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* Stats Section */
+    .article-stats {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Tooltip Styles */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: var(--tooltip-background);
+      color: var(--text-primary);
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .tooltip .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: var(--tooltip-background) transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Advanced Generation Styles */
+    .primary-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .primary-button:hover {
+      background-color: var(--accent-hover);
+    }
+    
+    .info-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      background-color: rgba(74, 134, 232, 0.1);
+      padding: 10px;
+      border-radius: 4px;
+    }
+    
+    .info-note i {
+      color: var(--accent-color);
+      margin-top: 3px;
+    }
+    
+    #loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      text-align: center;
+      padding: 0 20px;
+    }
+    
+    .loading-animation {
+      margin-bottom: 20px;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(74, 134, 232, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--accent-color);
+      animation: spin 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+    
+    .loading-subtext {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1200px) {
+      .app-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+        height: auto;
+      }
+
+      .article-panel {
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .info-panel {
+        height: auto;
+        border-left: none;
+        border-top: 1px solid var(--separator-color);
+      }
+      
+      .action-bar {
+        right: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .article-content-wrapper {
+        padding: 20px 15px 100px;
+      }
+
+      .article-title {
+        font-size: 1.8rem;
+      }
+
+      .article-subtitle {
+        font-size: 1.2rem;
+      }
+
+      .action-bar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+      }
+
+      .action-bar-section {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .reading-preferences {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .preference-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+
+  <div class="app-container">
+    <!-- Article Panel -->
+    <div class="article-panel">
+      <!-- Article Header -->
+      <div class="panel-header">
+        <div class="article-header-content">
+          <h1 class="header-title">Article Draft</h1>
+          <p class="header-subtitle">Step 4 of 4</p>
+        </div>
+        <div class="header-actions">
+          <button class="action-button tooltip" id="copyButton">
+            <i class="fas fa-copy"></i>
+            <span class="tooltip-text">Copy article to clipboard</span>
+          </button>
+          <button class="action-button tooltip" id="printButton">
+            <i class="fas fa-print"></i>
+            <span class="tooltip-text">Print article</span>
+          </button>
+          <button class="action-button tooltip" id="settingsButton">
+            <i class="fas fa-ellipsis-v"></i>
+            <span class="tooltip-text">More options</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Reading Preferences -->
+      <div class="article-content-wrapper">
+        <div class="reading-preferences">
+          <div class="preference-group">
+            <span class="preference-label">Text size:</span>
+            <div class="font-size-controls">
+              <button class="font-button" id="decreaseFont">A-</button>
+              <button class="font-button" id="increaseFont">A+</button>
+            </div>
+          </div>
+          <div class="preference-group">
+            <span class="preference-label">Width:</span>
+            <select class="dropdown-select" id="widthSelect">
+              <option value="narrow">Narrow</option>
+              <option value="medium" selected>Medium</option>
+              <option value="wide">Wide</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Article Content -->
+        <div id="loading-container" style="display: none;">
+          <div class="loading-animation">
+            <div class="spinner"></div>
+          </div>
+          <p class="loading-text">Generating your advanced article...</p>
+          <p class="loading-subtext">This may take a minute while we analyze your sources and writing style</p>
+        </div>
+
+        <div id="article-container">
+          <h1 class="article-title">{{ article.title|default('Your Article Title Will Appear Here') }}</h1>
+          <h2 class="article-subtitle">{{ article.subtitle|default('A compelling subtitle will be generated based on your content strategy') }}</h2>
+          
+          <!-- API Error Alert -->
+          {% if api_error %}
+          <div style="background-color: #ffebee; border-left: 4px solid #f44336; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <h3 style="color: #d32f2f; margin-top: 0;">API Authentication Error</h3>
+            <p>The system was unable to authenticate with the Claude API. This is typically caused by an invalid or expired API key.</p>
+            <p><strong>Error details:</strong> {{ error_message }}</p>
+            <p><strong>How to fix this:</strong> You need to obtain a valid API key from Anthropic and update the CLAUDE_API_KEY value in your .env file.</p>
+          </div>
+          {% endif %}
+          
+          <!-- Prominent Generate Advanced Article Button -->
+          <div style="text-align: center; margin: 20px 0;">
+            <button id="mainGenerateBtn" class="action-button-primary" style="padding: 15px 30px; font-size: 16px; background-color: var(--accent-color); color: white; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+              <i class="fas fa-magic" style="margin-right: 10px;"></i> Generate Advanced Article
+            </button>
+          </div>
+          
+          <!-- Article Statistics -->
+          <div class="article-stats">
+            <div class="stat-item">
+              <span class="stat-value">7</span>
+              <span class="stat-label">Sections</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">~1500</span>
+              <span class="stat-label">Words</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">8</span>
+              <span class="stat-label">Min read</span>
+            </div>
+          </div>
+          
+          <!-- Progress indicator -->
+          <div class="progress-container">
+            <div class="progress-bar" id="readingProgress"></div>
+          </div>
+          
+          <div class="article-body">
+            <p>{{ article.intro|default('') }}</p>
+            <p>{{ article.overview|default('') }}</p>
+            
+            {% for section in article.sections %}
+            <h3>{{ section.title }}</h3>
+            <ul>
+              {% for bullet in section.bullets %}
+              <li>{{ bullet }}</li>
+              {% endfor %}
+            </ul>
+            {% endfor %}
+            
+            <p class="article-conclusion">{{ article.conclusion|default('') }}</p>
+          </div>
+        </div>
+        
+        {% for section in article.sections %}
+        <h3>{{ section.title }}</h3>
+        <ul>
+          {% for bullet in section.bullets %}
+          <li>{{ bullet }}</li>
+          {% endfor %}
+        </ul>
+        {% endfor %}
+        
+        <p class="article-conclusion">{{ article.conclusion }}</p>
+      </div>
+
+      <!-- Floating Action Bar -->
+      <div class="action-bar">
+        <div class="action-bar-section">
+          <div class="article-status">
+            <i class="fas fa-check-circle status-icon"></i>
+            <span>Article ready</span>
+          </div>
+        </div>
+        <div class="action-bar-section">
+          <button class="action-button-secondary" id="backButton">
+            <i class="fas fa-arrow-left"></i>
+            Back
+          </button>
+          <button class="action-button-primary" id="downloadButton">
+            <i class="fas fa-download"></i>
+            Download Article
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Information Panel -->
+    <div class="info-panel">
+      <!-- Summary Section -->
+      <div class="info-section">
+        <h3 class="info-section-title">Content Summary</h3>
+        <div class="info-section-content">
+          <p><strong>Content Strategy:</strong> {{ content_strategy|default('Not specified') }}</p>
+          <p><strong>Primary Topic:</strong> {{ primary_topic|default('Not specified') }}</p>
+          {% if secondary_topics %}
+          <p><strong>Secondary Topics:</strong> {{ secondary_topics|join(', ') }}</p>
+          {% endif %}
+          <p><strong>Publishing Schedule:</strong> {{ publishing_schedule|default('Weekly') }}</p>
+          <p><strong>Content Type:</strong> {{ content_type|default('Blog Post') }}</p>
+          <p><strong>Content Focus:</strong> {{ content_focus|default('Educational') }}</p>
+        </div>
+      </div>
+      
+      <!-- Advanced Generation Section -->
+      <div class="info-section">
+        <h3 class="info-section-title">Advanced Generation</h3>
+        <div class="info-section-content">
+          <p>Generate a comprehensive 4000-word article using Claude AI, analyzing your sources and writing style.</p>
+          {% if use_advanced_generator %}
+          <button id="generateAdvancedBtn" class="primary-button">
+            <i class="fas fa-magic"></i> Generate Advanced Article
+          </button>
+          <div class="info-note">
+            <i class="fas fa-info-circle"></i>
+            <span>This will create a well-researched article by analyzing your sources, writing style, and topic</span>
+          </div>
+          {% else %}
+          <div class="info-note">
+            <i class="fas fa-info-circle"></i>
+            <span>Advanced generation is disabled. Enable it in your content strategy settings.</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Target Audience Section -->
+      <div class="info-section">
+        <h3 class="info-section-title">Target Audience</h3>
+        <div class="info-section-content">
+          <p>{{ article.summary.audience }}</p>
+        </div>
+      </div>
+
+      <!-- Key Insights Section -->
+      <div class="info-section">
+        <h3 class="info-section-title">Key Insights</h3>
+        <div class="info-section-content">
+          {% for insight in article.summary.insights %}
+          <div class="insight-item">
+            <span class="insight-bullet">•</span>
+            <span>{{ insight }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Article Metadata Section -->
+      <div class="info-section">
+        <h3 class="info-section-title">Article Metadata</h3>
+        <div class="info-section-content">
+          <div class="info-item">
+            <div class="info-item-label">Generated on</div>
+            <div class="info-item-value">{{ article.date }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Writing style</div>
+            <div class="info-item-value">Technical with conversational clarity</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Publishing frequency</div>
+            <div class="info-item-value">{{ article.publishing_frequency|default('Weekly', true) }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Sources used</div>
+            <div class="info-item-value">{{ (article.sources|default([])|length) or 3 }} sources</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- What's Next Section -->
+      <div class="info-section">
+        <h3 class="info-section-title">What's Next</h3>
+        <div class="info-section-content">
+          <p>You can download this article or further customize it. Once you're satisfied with the content, consider:</p>
+          <ul style="padding-left: 20px; margin-top: 10px;">
+            <li>Publishing to your connected platforms</li>
+            <li>Scheduling for optimal engagement times</li>
+            <li>Creating follow-up content based on this theme</li>
+            <li>Generating variations for different audiences</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DOM elements
+    const articleBody = document.querySelector('.article-body');
+    const backButton = document.getElementById('backButton');
+    const downloadButton = document.getElementById('downloadButton');
+    const copyButton = document.getElementById('copyButton');
+    const printButton = document.getElementById('printButton');
+    const decreaseFontButton = document.getElementById('decreaseFont');
+    const increaseFontButton = document.getElementById('increaseFont');
+    const widthSelect = document.getElementById('widthSelect');
+    const progressBar = document.getElementById('readingProgress');
+    const generateAdvancedBtn = document.getElementById('generateAdvancedBtn');
+    const articleContainer = document.getElementById('article-container');
+    const loadingContainer = document.getElementById('loading-container');
+
+    // Check if all required elements exist
+    console.log("Article body element:", articleBody);
+    console.log("Article container element:", articleContainer);
+    console.log("Loading container element:", loadingContainer);
+    console.log("Generate advanced button:", generateAdvancedBtn);
+
+    if (!articleBody) {
+      console.error("Article body element not found! This will prevent content from displaying.");
+    }
+    if (!articleContainer) {
+      console.error("Article container element not found!");
+    }
+    if (!loadingContainer) {
+      console.error("Loading container element not found!");
+    }
+
+    // Font size control
+    let currentFontSize = 1.05; // Default font size in rem
+    
+    decreaseFontButton.addEventListener('click', () => {
+      if (currentFontSize > 0.8) {
+        currentFontSize -= 0.1;
+        articleBody.style.fontSize = `${currentFontSize}rem`;
+      }
+    });
+    
+    increaseFontButton.addEventListener('click', () => {
+      if (currentFontSize < 1.5) {
+        currentFontSize += 0.1;
+        articleBody.style.fontSize = `${currentFontSize}rem`;
+      }
+    });
+    
+    // Width control
+    widthSelect.addEventListener('change', () => {
+      const articleWrapper = document.querySelector('.article-content-wrapper');
+      switch(widthSelect.value) {
+        case 'narrow':
+          articleWrapper.style.maxWidth = '650px';
+          break;
+        case 'medium':
+          articleWrapper.style.maxWidth = '800px';
+          break;
+        case 'wide':
+          articleWrapper.style.maxWidth = '1000px';
+          break;
+      }
+    });
+    
+    // Reading progress
+    window.addEventListener('scroll', () => {
+      const articlePanel = document.querySelector('.article-panel');
+      const scrollTop = articlePanel.scrollTop;
+      const docHeight = articlePanel.scrollHeight;
+      const winHeight = articlePanel.clientHeight;
+      const scrollPercent = scrollTop / (docHeight - winHeight);
+      progressBar.style.width = `${scrollPercent * 100}%`;
+    });
+    
+    // Back button functionality
+    backButton.addEventListener('click', () => {
+      window.location.href = '/content_strategy';
+    });
+    
+    // Download button functionality
+    downloadButton.addEventListener('click', () => {
+      // Create a blob with the article content
+      const title = document.querySelector('.article-title').innerText;
+      const subtitle = document.querySelector('.article-subtitle').innerText;
+      const content = articleBody.innerText;
+      
+      const formattedContent = `${title}\n\n${subtitle}\n\n${content}`;
+      const blob = new Blob([formattedContent], { type: 'text/plain' });
+      
+      // Create a download link
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = 'socialme_article.txt';
+      
+      // Trigger download
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      // Show success message
+      showToast('Article downloaded successfully!');
+    });
+    
+    // Copy button functionality
+    copyButton.addEventListener('click', () => {
+      const title = document.querySelector('.article-title').innerText;
+      const subtitle = document.querySelector('.article-subtitle').innerText;
+      const content = articleBody.innerText;
+      
+      const formattedContent = `${title}\n\n${subtitle}\n\n${content}`;
+      
+      navigator.clipboard.writeText(formattedContent).then(() => {
+        showToast('Article copied to clipboard!');
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+      });
+    });
+    
+    // Print button functionality
+    printButton.addEventListener('click', () => {
+      window.print();
+    });
+    
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      // Check if there's already a toast
+      let toast = document.querySelector('.toast-notification');
+      
+      if (toast) {
+        toast.remove();
+      }
+      
+      // Create toast element
+      toast = document.createElement('div');
+      toast.className = 'toast-notification';
+      toast.style.position = 'fixed';
+      toast.style.bottom = '30px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.backgroundColor = type === 'success' ? 'rgba(74, 134, 232, 0.9)' : 'rgba(255, 0, 0, 0.9)';
+      toast.style.color = 'white';
+      toast.style.padding = '12px 24px';
+      toast.style.borderRadius = '4px';
+      toast.style.zIndex = '1000';
+      toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s ease';
+      
+      toast.textContent = message;
+      
+      document.body.appendChild(toast);
+      
+      // Trigger animation
+      setTimeout(() => {
+        toast.style.opacity = '1';
+      }, 10);
+      
+      // Remove after delay
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 300);
+      }, 3000);
+    }
+    
+    // Initialize scrolling event listener for the article panel
+    document.addEventListener('DOMContentLoaded', () => {
+      const articlePanel = document.querySelector('.article-panel');
+      articlePanel.addEventListener('scroll', () => {
+        const scrollTop = articlePanel.scrollTop;
+        const headerHeight = document.querySelector('.panel-header').offsetHeight;
+        
+        if (scrollTop > headerHeight) {
+          document.querySelector('.panel-header').classList.add('scrolled');
+        } else {
+          document.querySelector('.panel-header').classList.remove('scrolled');
+        }
+      });
+      
+      // Add event listener for advanced generation
+      if (generateAdvancedBtn) {
+        generateAdvancedBtn.addEventListener('click', generateAdvancedArticle);
+      }
+      
+      // Add event listener for the main generate button
+      const mainGenerateBtn = document.getElementById('mainGenerateBtn');
+      if (mainGenerateBtn) {
+        console.log("Found main generate button, adding event listener");
+        mainGenerateBtn.addEventListener('click', generateAdvancedArticle);
+      } else {
+        console.error("Main generate button not found!");
+      }
+    });
+    
+    // Function to generate advanced article
+    function generateAdvancedArticle() {
+      console.log("Starting advanced article generation...");
+      // Show loading animation
+      articleContainer.style.display = 'none';
+      loadingContainer.style.display = 'flex';
+      
+      // Call the advanced article generation endpoint
+      fetch('/generate_advanced_article', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        console.log("Response received:", response);
+        if (!response.ok) {
+          throw new Error('Failed to generate advanced article');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Article data received:", data);
+        if (data.status === 'success') {
+          // Update the article content
+          document.querySelector('.article-title').textContent = data.article.title || 'Advanced Article';
+          
+          // Build the article body HTML
+          let bodyHtml = '';
+          
+          // Add introduction
+          if (data.article.introduction) {
+            console.log("Adding introduction:", data.article.introduction);
+            bodyHtml += `<div class="article-introduction"><p>${data.article.introduction}</p></div>`;
+          }
+          
+          // Add body sections (handles both formats: sections array or body array)
+          if (data.article.body && Array.isArray(data.article.body)) {
+            console.log("Processing body array:", data.article.body);
+            // New advanced format with body array of section objects
+            data.article.body.forEach(section => {
+              if (section.subheading) {
+                bodyHtml += `<h3>${section.subheading}</h3>`;
+              }
+              if (section.content) {
+                // Split content into paragraphs and wrap each in <p> tags
+                const paragraphs = section.content.split('\n\n').filter(p => p.trim() !== '');
+                paragraphs.forEach(para => {
+                  bodyHtml += `<p>${para}</p>`;
+                });
+              }
+              // Add source citations if available
+              if (section.sources && section.sources.length > 0) {
+                bodyHtml += `<div class="section-sources"><small>Sources: ${section.sources.join(', ')}</small></div>`;
+              }
+            });
+          } else if (data.article.sections && Array.isArray(data.article.sections)) {
+            console.log("Processing sections array:", data.article.sections);
+            // Legacy format with sections array
+            data.article.sections.forEach(section => {
+              bodyHtml += `<h3>${section.title}</h3>`;
+              if (section.bullets && section.bullets.length > 0) {
+                bodyHtml += '<ul>';
+                section.bullets.forEach(bullet => {
+                  bodyHtml += `<li>${bullet}</li>`;
+                });
+                bodyHtml += '</ul>';
+              } else if (section.content) {
+                bodyHtml += `<p>${section.content}</p>`;
+              }
+            });
+          } else if (typeof data.article.body === 'string') {
+            console.log("Processing string body:", data.article.body);
+            // Simple string body
+            bodyHtml += `<div class="article-body-content">${data.article.body}</div>`;
+          } else {
+            console.log("Warning: No recognizable body format found in article data", data.article);
+          }
+          
+          // Add conclusion
+          if (data.article.conclusion) {
+            console.log("Adding conclusion:", data.article.conclusion);
+            bodyHtml += `<div class="article-conclusion"><h3>Conclusion</h3><p>${data.article.conclusion}</p></div>`;
+          }
+          
+          console.log("Final HTML to be inserted:", bodyHtml);
+          
+          // Update article statistics
+          const wordCount = countWords(data.article);
+          const readTime = Math.ceil(wordCount / 200); // Assuming 200 words per minute reading speed
+          const sectionsCount = data.article.body ? data.article.body.length : 
+                               (data.article.sections ? data.article.sections.length : 0);
+          
+          console.log("Article stats:", { wordCount, readTime, sectionsCount });
+          
+          // Update the statistics in the DOM
+          const statItems = document.querySelectorAll('.stat-item .stat-value');
+          if (statItems.length >= 3) {
+            statItems[0].textContent = sectionsCount || '0';
+            statItems[1].textContent = wordCount || '0';
+            statItems[2].textContent = readTime || '0';
+          }
+          
+          // Add sources section if available
+          if (data.article.sources && data.article.sources.length > 0) {
+            console.log("Adding sources:", data.article.sources);
+            bodyHtml += `<div class="article-sources">
+              <h3>Sources</h3>
+              <ul class="sources-list">`;
+            
+            data.article.sources.forEach(source => {
+              if (typeof source === 'object') {
+                bodyHtml += `<li><a href="${source.url || '#'}" target="_blank">${source.name || 'Untitled Source'}</a>`;
+                if (source.description) {
+                  bodyHtml += ` - ${source.description}`;
+                }
+                bodyHtml += `</li>`;
+              } else if (typeof source === 'string') {
+                bodyHtml += `<li>${source}</li>`;
+              }
+            });
+            
+            bodyHtml += `</ul></div>`;
+          }
+          
+          // Update the article body with the generated content
+          console.log("Updating article body element:", articleBody);
+          articleBody.innerHTML = bodyHtml;
+          
+          // Display validation information if available
+          if (data.validation) {
+            console.log("Adding validation info:", data.validation);
+            let validationInfo = `
+              <div class="validation-info">
+                <p><strong>Sources used:</strong> ${data.validation.sources_used || 0}</p>
+                <p><strong>Word count:</strong> ${data.validation.word_count || 0}</p>
+                <p><strong>Generated on:</strong> ${data.validation.generation_time || 'Unknown'}</p>
+              </div>
+            `;
+            
+            // Find a place to add the validation info
+            const infoSection = document.querySelector('.info-section:last-child');
+            if (infoSection) {
+              infoSection.innerHTML += validationInfo;
+            }
+          }
+          
+          // Show success message
+          showToast('Advanced article generated successfully!');
+        } else {
+          // Show error message
+          console.error("Article generation failed:", data.message);
+          showToast(data.message || 'Failed to generate advanced article', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error generating advanced article:', error);
+        showToast('Error generating advanced article. Please try again.', 'error');
+      })
+      .finally(() => {
+        // Hide loading animation and show article
+        console.log("Finishing article generation process");
+        loadingContainer.style.display = 'none';
+        articleContainer.style.display = 'block';
+      });
+    }
+    
+    // Helper function to count words in the article
+    function countWords(article) {
+      let text = '';
+      
+      // Add title
+      if (article.title) text += ' ' + article.title;
+      
+      // Add introduction
+      if (article.introduction) text += ' ' + article.introduction;
+      
+      // Add body content
+      if (Array.isArray(article.body)) {
+        article.body.forEach(section => {
+          if (section.subheading) text += ' ' + section.subheading;
+          if (section.content) text += ' ' + section.content;
+        });
+      } else if (typeof article.body === 'string') {
+        text += ' ' + article.body;
+      }
+      
+      // Add sections content (legacy format)
+      if (article.sections && Array.isArray(article.sections)) {
+        article.sections.forEach(section => {
+          if (section.title) text += ' ' + section.title;
+          if (section.content) text += ' ' + section.content;
+          if (section.bullets && Array.isArray(section.bullets)) {
+            section.bullets.forEach(bullet => {
+              text += ' ' + bullet;
+            });
+          }
+        });
+      }
+      
+      // Add conclusion
+      if (article.conclusion) text += ' ' + article.conclusion;
+      
+      // Count words (split by whitespace and filter out empty strings)
+      return text.split(/\s+/).filter(word => word.length > 0).length;
+    }
+  </script>
+{% endblock %}

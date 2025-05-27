@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SocialMe - Article Preview</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .article-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    
+    .article-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    
+    .article-subtitle {
+      font-size: 1.5rem;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+    
+    .article-body {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    .article-body h2 {
+      font-size: 1.8rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #444;
+    }
+    
+    .article-body p {
+      margin-bottom: 1.5rem;
+    }
+    
+    .article-sources {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #eee;
+    }
+    
+    .article-sources h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: #555;
+    }
+    
+    .article-sources ul {
+      padding-left: 1.5rem;
+    }
+    
+    .article-sources li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .article-sources a {
+      color: #3b5998;
+      text-decoration: none;
+    }
+    
+    .article-sources a:hover {
+      text-decoration: underline;
+    }
+    
+    .error-message {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    
+    .loading-container {
+      text-align: center;
+      padding: 3rem;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #3b5998;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 2rem;
+      color: #3b5998;
+      text-decoration: none;
+    }
+    
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5 mb-5">
+    <!-- Loading indicator -->
+    <div class="loading-container" id="loadingIndicator">
+      <div class="spinner"></div>
+      <p>Loading your article...</p>
+    </div>
+    
+    <!-- Error message (hidden by default) -->
+    <div class="error-message" id="errorMessage" style="display: none;">
+      <strong>Error:</strong> <span id="errorText"></span>
+    </div>
+    
+    <!-- Article container (hidden until loaded) -->
+    <div class="article-container" id="articleContainer" style="display: none;">
+      <h1 class="article-title" id="articleTitle"></h1>
+      <h2 class="article-subtitle" id="articleSubtitle"></h2>
+      <div class="article-body" id="articleBody"></div>
+      
+      <div class="article-sources">
+        <h3>Sources</h3>
+        <ul id="articleSources"></ul>
+      </div>
+      
+      <a href="{{ url_for('generate_content') }}" class="back-link">← Back to Content Generator</a>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get article data from the server
+      var articleData = JSON.parse('{{ article_data|safe }}');
+      
+      // Wait a bit to show the loading indicator for demo purposes
+      setTimeout(function() {
+        // Hide loading indicator
+        document.getElementById('loadingIndicator').style.display = 'none';
+        
+        if (!articleData || !articleData.title) {
+          // Show error message
+          document.getElementById('errorText').textContent = 'Failed to load article data. Please try again.';
+          document.getElementById('errorMessage').style.display = 'block';
+          return;
+        }
+        
+        // Populate article data
+        document.getElementById('articleTitle').textContent = articleData.title || 'Untitled Article';
+        document.getElementById('articleSubtitle').textContent = articleData.subtitle || '';
+        
+        // Handle article body
+        var articleBody = document.getElementById('articleBody');
+        
+        if (typeof articleData.body === 'string') {
+          // If body is a string, insert as HTML
+          articleBody.innerHTML = articleData.body;
+        } else if (Array.isArray(articleData.body)) {
+          // If body is an array, create sections
+          articleData.body.forEach(function(section) {
+            if (section.heading) {
+              var heading = document.createElement('h2');
+              heading.textContent = section.heading;
+              articleBody.appendChild(heading);
+            }
+            
+            if (section.content) {
+              var content = document.createElement('p');
+              content.innerHTML = section.content;
+              articleBody.appendChild(content);
+            }
+          });
+        } else if (articleData.sections && Array.isArray(articleData.sections)) {
+          // Alternative format with sections
+          articleData.sections.forEach(function(section) {
+            if (section.title) {
+              var heading = document.createElement('h2');
+              heading.textContent = section.title;
+              articleBody.appendChild(heading);
+            }
+            
+            if (section.content) {
+              var content = document.createElement('p');
+              content.innerHTML = section.content;
+              articleBody.appendChild(content);
+            }
+          });
+          
+          // Add conclusion if present
+          if (articleData.conclusion) {
+            var heading = document.createElement('h2');
+            heading.textContent = 'Conclusion';
+            articleBody.appendChild(heading);
+            
+            var content = document.createElement('p');
+            content.innerHTML = articleData.conclusion;
+            articleBody.appendChild(content);
+          }
+        }
+        
+        // Handle sources
+        var sourcesList = document.getElementById('articleSources');
+        
+        if (articleData.sources && Array.isArray(articleData.sources)) {
+          articleData.sources.forEach(function(source) {
+            var li = document.createElement('li');
+            
+            if (source.url && source.name) {
+              var a = document.createElement('a');
+              a.href = source.url;
+              a.textContent = source.name;
+              a.target = '_blank';
+              li.appendChild(a);
+            } else if (source.url) {
+              var a = document.createElement('a');
+              a.href = source.url;
+              a.textContent = source.url;
+              a.target = '_blank';
+              li.appendChild(a);
+            } else if (source.name) {
+              li.textContent = source.name;
+            }
+            
+            sourcesList.appendChild(li);
+          });
+        }
+        
+        // Show article container
+        document.getElementById('articleContainer').style.display = 'block';
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+1. Overview of SocialMe
+
+SocialMe is an AI-driven content creation system designed to generate high-quality articles using web-crawled sources, AI-based structuring, and advanced LLM integration (Anthropic's Claude API). The platform automates source collection, article structuring, AI-enhanced content generation, and evaluation, making it a scalable tool for producing engaging, research-backed content.
+
+2. High-Level System Architecture
+
+The system consists of three major components:
+- Source Collection & Processing
+- AI-Powered Article Generation
+- Article Evaluation & Optimization
+
+3. Key Components & Their Roles
+- **Web Crawling & Source Collection**: Universal Crawler (scrapes sources), Database (stores data), API Handling (manage routes).
+- **AI-Enhanced Article Generator**: Main generator (uses Claude API), LLM API integration, Structured Prompting.
+- **Article Evaluation System**: Evaluates quality, readability, SEO, engagement.
+
+4. Development Log & Fixes
+- Fixed LLM integration, improved prompt structuring.
+- Issue: Low article scores (~25-50/100).
+
+5. Current Challenges & Next Steps
+- AI-generated text is repetitive, readability is too high, SEO optimization is low.
+- Next steps: Improve Style Adaptation, Context Window, SEO, Evaluation Pipeline.
+
+6. Key Files & Their Purposes
+- **Main Files**: socialme_app.py, models.py, enhanced_article_generator.py, etc.
+- **Web Crawling**: universal_crawler.py, source_diagnostics.py.
+- **Article Evaluation**: article_evaluation.py.
+- **Utility**: advanced_debug.py, server_explorer.py.
+
+7. Dependencies & How They Interact
+- Python Libraries: Flask, SQLAlchemy, requests, BeautifulSoup, Selenium, feedparser, anthropic, textstat, dotenv, logging.
+- External Services: Claude API, Google Cloud / AWS.
+

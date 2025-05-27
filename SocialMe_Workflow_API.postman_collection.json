@@ -1,0 +1,155 @@
+{
+	"info": {
+		"_postman_id": "workflow-api-v2",
+		"name": "SocialMe Content Generation Workflow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Start Workflow",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/workflow/start",
+					"host": ["{{base_url}}"],
+					"path": ["api", "workflow", "start"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Topic",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"primary_topic\": \"AI in Healthcare\",\n    \"secondary_topics\": [\"Machine Learning\", \"Medical Diagnostics\"]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/workflow/{{workflow_id}}/topic",
+					"host": ["{{base_url}}"],
+					"path": ["api", "workflow", "{{workflow_id}}", "topic"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Avatar",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"avatar_url\": \"https://example.com/avatar.jpg\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/workflow/{{workflow_id}}/avatar",
+					"host": ["{{base_url}}"],
+					"path": ["api", "workflow", "{{workflow_id}}", "avatar"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Data Sources",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"urls\": [\n        \"https://www.nature.com/articles/example\",\n        \"https://www.scientificamerican.com/article/ai-healthcare\"\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/workflow/{{workflow_id}}/key-data-sources",
+					"host": ["{{base_url}}"],
+					"path": ["api", "workflow", "{{workflow_id}}", "key-data-sources"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tone Analysis",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"urls\": [\n        \"https://www.wired.com/story/ai-medical-breakthroughs\",\n        \"https://www.scientificamerican.com/article/ai-in-medicine\"\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/workflow/{{workflow_id}}/tone-analysis",
+					"host": ["{{base_url}}"],
+					"path": ["api", "workflow", "{{workflow_id}}", "tone-analysis"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Generate Article",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/workflow/{{workflow_id}}/generate-article",
+					"host": ["{{base_url}}"],
+					"path": ["api", "workflow", "{{workflow_id}}", "generate-article"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Article",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"edits\": {\n        \"tone\": \"More academic\"\n    }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/workflow/{{workflow_id}}/validate-article",
+					"host": ["{{base_url}}"],
+					"path": ["api", "workflow", "{{workflow_id}}", "validate-article"]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8004"
+		},
+		{
+			"key": "workflow_id",
+			"value": ""
+		}
+	]
+}

@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "total_word_count": 15637,
+    "successful_extractions": 1,
+    "failed_extractions": 0
+  },
+  "sources": [
+    {
+      "url": "https://en.wikipedia.org/wiki/Artificial_intelligence_in_healthcare",
+      "word_count": 15637,
+      "metadata": {
+        "extraction_method": "main_content",
+        "confidence": 0.8,
+        "word_count": 15637
+      },
+      "content_preview": "Toggle the table of contents Artificial intelligence in healthcare 18 languages \u0627\u0644\u0639\u0631\u0628\u064a\u0629 Catal\u00e0 \u010ce\u0161tina Deutsch Eesti Espa\u00f1ol \u0641\u0627\u0631\u0633\u06cc Fran\u00e7ais \ud55c\uad6d\uc5b4 \u0540\u0561\u0575\u0565\u0580\u0565\u0576 \u0939\u093f\u0928\u094d\u0926\u0940 Italiano \u0420\u0443\u0441\u0441\u043a\u0438\u0439 Simple English \u0421\u0440\u043f\u0441\u043a\u0438 / srpski Suomi T\u00fcrk\u00e7e \u4e2d\u6587 Edit links Article Talk English Read Edit View history Tools Tools move to sidebar hide Actions Read Edit View history General What links here Related changes Upload file Permanent link Page information Cite this page Get shortened URL Download QR code Print/export Download as..."
+    }
+  ]
+}
