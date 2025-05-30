@@ -1,4 +1,4 @@
-# SocialMe Content Generation Workflow
+# SocialMe (FLask) Content Generation Workflow
 
 ## Project Overview
 SocialMe is an advanced AI-powered content generation platform designed to create high-quality, contextually relevant articles using sophisticated NLP techniques.
