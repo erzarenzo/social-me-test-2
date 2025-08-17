@@ -35,7 +35,7 @@ class ArticleGeneratorFactory:
         try:
             # Use environment variable if no API key provided
             if not api_key:
-                api_key = os.environ.get('CLAUDE_API_KEY')
+                api_key = os.environ.get('ANTHROPIC_API_KEY') or os.environ.get('CLAUDE_API_KEY')
             
             if generator_type == "auto":
                 # Auto-detect based on available dependencies and API key

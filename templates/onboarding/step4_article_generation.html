@@ -262,8 +262,8 @@ function generateArticle() {
   document.getElementById('loadingIndicator').classList.add('visible');
   document.getElementById('generateBtn').disabled = true;
   
-  // Send request to generate-article endpoint
-  fetch('/generate-article', {
+          // Send request to generate-article endpoint
+        fetch('/onboarding/generate-article', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -280,9 +280,12 @@ function generateArticle() {
         const scriptElement = document.createElement('script');
         scriptElement.innerHTML = data.redirect_script;
         document.body.appendChild(scriptElement);
+      } else if (data.redirect_url) {
+        // Use the redirect URL from the response
+        window.location.href = data.redirect_url;
       } else {
-        // Otherwise, redirect manually
-        window.location.href = '/article-preview';
+        // Fallback redirect
+        window.location.href = '/onboarding/article-preview';
       }
     } else {
       // Handle error

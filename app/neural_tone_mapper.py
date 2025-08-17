@@ -149,34 +149,62 @@ class NeuralToneMapper:
         Returns:
             dict: Comprehensive tone analysis results
         """
-        # Normalize and extract content from sources
-        processed_sources = []
-        for source in text_sources:
-            # Check if source is a URL
-            if source.startswith(('http://', 'https://')):
-                content = self.extract_content_from_url(source)
-            else:
-                content = source
+        try:
+            # Normalize and extract content from sources
+            processed_sources = []
+            for source in text_sources:
+                try:
+                    # Check if source is a URL
+                    if source.startswith(('http://', 'https://')):
+                        content = self.extract_content_from_url(source)
+                    else:
+                        content = source
+                    
+                    if content and len(content.strip()) > 0:
+                        processed_sources.append(content)
+                except Exception as e:
+                    self.logger.warning(f"Error processing source {source}: {e}")
+                    continue
             
-            if content:
-                processed_sources.append(content)
-        
-        # Combine sources
-        combined_text = ' '.join(processed_sources)
-        
-        # Advanced tone analysis
-        tone_profile = {
-            "thought_patterns": self._analyze_thought_patterns(combined_text),
-            "reasoning_styles": self._analyze_reasoning_styles(combined_text),
-            "domain_characteristics": self._identify_domain_markers(combined_text),
-            "key_phrases": self._extract_key_phrases(combined_text),
-            "linguistic_complexity": self._measure_linguistic_complexity(combined_text)
-        }
-        
-        # Compute overall tone score
-        tone_profile['overall_tone_score'] = self._compute_tone_score(tone_profile)
-        
-        return tone_profile
+            # Handle case where no content could be processed
+            if not processed_sources:
+                return {
+                    "thought_patterns": {"analytical": 0.5, "creative": 0.5, "systematic": 0.5, "intuitive": 0.5},
+                    "reasoning_styles": {"deductive": 0.5, "inductive": 0.5, "abductive": 0.5, "analogical": 0.5},
+                    "domain_characteristics": {"technical": 0.5, "business": 0.5, "academic": 0.5, "journalistic": 0.5},
+                    "key_phrases": [],
+                    "linguistic_complexity": {"avg_sentence_length": 10.0, "word_complexity": 2.0},
+                    "overall_tone_score": 0.5
+                }
+            
+            # Combine sources
+            combined_text = ' '.join(processed_sources)
+            
+            # Advanced tone analysis
+            tone_profile = {
+                "thought_patterns": self._analyze_thought_patterns(combined_text),
+                "reasoning_styles": self._analyze_reasoning_styles(combined_text),
+                "domain_characteristics": self._identify_domain_markers(combined_text),
+                "key_phrases": self._extract_key_phrases(combined_text),
+                "linguistic_complexity": self._measure_linguistic_complexity(combined_text)
+            }
+            
+            # Compute overall tone score
+            tone_profile['overall_tone_score'] = self._compute_tone_score(tone_profile)
+            
+            return tone_profile
+            
+        except Exception as e:
+            self.logger.error(f"Error in analyze_tone: {e}")
+            # Return default analysis on error
+            return {
+                "thought_patterns": {"analytical": 0.5, "creative": 0.5, "systematic": 0.5, "intuitive": 0.5},
+                "reasoning_styles": {"deductive": 0.5, "inductive": 0.5, "abductive": 0.5, "analogical": 0.5},
+                "domain_characteristics": {"technical": 0.5, "business": 0.5, "academic": 0.5, "journalistic": 0.5},
+                "key_phrases": [],
+                "linguistic_complexity": {"avg_sentence_length": 10.0, "word_complexity": 2.0},
+                "overall_tone_score": 0.5
+            }
     
     def _analyze_thought_patterns(self, text):
         """
@@ -284,33 +312,76 @@ class NeuralToneMapper:
         Returns:
             dict: Linguistic complexity metrics
         """
-        # Sentence length analysis
-        sentences = re.split(r'[.!?]+', text)
-        avg_sentence_length = np.mean([len(sentence.split()) for sentence in sentences if sentence.strip()])
-        
-        # Word complexity (using syllable count as a proxy)
-        def count_syllables(word):
-            """Simple syllable counting heuristic"""
-            word = word.lower()
-            count = 0
-            vowels = "aeiouy"
-            if word[0] in vowels:
-                count += 1
-            for index in range(1, len(word)):
-                if word[index] in vowels and word[index - 1] not in vowels:
+        try:
+            # Handle empty or very short text
+            if not text or len(text.strip()) < 10:
+                return {
+                    "avg_sentence_length": 10.0,
+                    "word_complexity": 2.0
+                }
+            
+            # Sentence length analysis
+            sentences = re.split(r'[.!?]+', text)
+            sentences = [s.strip() for s in sentences if s.strip()]  # Remove empty sentences
+            
+            if not sentences:
+                return {
+                    "avg_sentence_length": 10.0,
+                    "word_complexity": 2.0
+                }
+            
+            sentence_lengths = [len(sentence.split()) for sentence in sentences if sentence.strip()]
+            
+            if not sentence_lengths:
+                avg_sentence_length = 10.0
+            else:
+                avg_sentence_length = np.mean(sentence_lengths)
+                if np.isnan(avg_sentence_length) or np.isinf(avg_sentence_length):
+                    avg_sentence_length = 10.0
+            
+            # Word complexity (using syllable count as a proxy)
+            def count_syllables(word):
+                """Simple syllable counting heuristic"""
+                if not word or len(word) < 2:
+                    return 1
+                    
+                word = word.lower()
+                count = 0
+                vowels = "aeiouy"
+                if word[0] in vowels:
                     count += 1
-            if word.endswith("e"):
-                count -= 1
-            if count == 0:
-                count += 1
-            return count
-        
-        word_complexity = np.mean([count_syllables(word) for word in text.split()])
-        
-        return {
-            "avg_sentence_length": avg_sentence_length,
-            "word_complexity": word_complexity
-        }
+                for index in range(1, len(word)):
+                    if word[index] in vowels and word[index - 1] not in vowels:
+                        count += 1
+                if word.endswith("e"):
+                    count -= 1
+                if count == 0:
+                    count += 1
+                return count
+            
+            words = text.split()
+            if not words:
+                word_complexity = 2.0
+            else:
+                syllable_counts = [count_syllables(word) for word in words if word.strip()]
+                if not syllable_counts:
+                    word_complexity = 2.0
+                else:
+                    word_complexity = np.mean(syllable_counts)
+                    if np.isnan(word_complexity) or np.isinf(word_complexity):
+                        word_complexity = 2.0
+            
+            return {
+                "avg_sentence_length": float(avg_sentence_length),
+                "word_complexity": float(word_complexity)
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error measuring linguistic complexity: {e}")
+            return {
+                "avg_sentence_length": 10.0,
+                "word_complexity": 2.0
+            }
     
     def _compute_tone_score(self, tone_profile):
         """
@@ -322,28 +393,53 @@ class NeuralToneMapper:
         Returns:
             float: Overall tone score
         """
-        # Weight different components of the tone profile
-        weights = {
-            "thought_patterns": 0.3,
-            "reasoning_styles": 0.25,
-            "domain_characteristics": 0.2,
-            "linguistic_complexity": 0.25
-        }
-        
-        # Normalize and compute weighted score
-        def normalize_scores(scores):
-            max_val = max(scores.values()) if scores else 1
-            return {k: v/max_val for k, v in scores.items()}
-        
-        # Compute weighted score
-        total_score = 0
-        for category, weight in weights.items():
-            if category in tone_profile:
-                normalized_scores = normalize_scores(tone_profile[category])
-                category_score = sum(normalized_scores.values()) / len(normalized_scores) if normalized_scores else 0
-                total_score += category_score * weight
-        
-        return total_score
+        try:
+            # Weight different components of the tone profile
+            weights = {
+                "thought_patterns": 0.3,
+                "reasoning_styles": 0.25,
+                "domain_characteristics": 0.2,
+                "linguistic_complexity": 0.25
+            }
+            
+            # Normalize and compute weighted score
+            def normalize_scores(scores):
+                if not scores:
+                    return {}
+                max_val = max(scores.values()) if scores else 1
+                if max_val == 0:
+                    return {k: 0.5 for k in scores.keys()}  # Default to 0.5 if all scores are 0
+                return {k: v/max_val for k, v in scores.items()}
+            
+            # Compute weighted score
+            total_score = 0
+            total_weight = 0
+            
+            for category, weight in weights.items():
+                if category in tone_profile and tone_profile[category]:
+                    try:
+                        normalized_scores = normalize_scores(tone_profile[category])
+                        if normalized_scores:
+                            category_score = sum(normalized_scores.values()) / len(normalized_scores)
+                            if not np.isnan(category_score) and not np.isinf(category_score):
+                                total_score += category_score * weight
+                                total_weight += weight
+                    except (ZeroDivisionError, ValueError) as e:
+                        self.logger.warning(f"Error computing score for {category}: {e}")
+                        continue
+            
+            # Return normalized score or default
+            if total_weight > 0:
+                final_score = total_score / total_weight
+                if np.isnan(final_score) or np.isinf(final_score):
+                    return 0.5
+                return float(final_score)
+            else:
+                return 0.5
+                
+        except Exception as e:
+            self.logger.error(f"Error computing tone score: {e}")
+            return 0.5
 
     def generate_style_prompt(self, tone_profile):
         """

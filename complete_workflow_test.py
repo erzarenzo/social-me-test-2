@@ -30,7 +30,7 @@ from app.utils.config import config
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO if not config.debug else logging.DEBUG,
+    level=logging.INFO if not config.DEBUG else logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler("workflow_test.log"),
@@ -68,7 +68,7 @@ def run_flask_server(app, port):
         app (Flask): Flask application instance
         port (int): Port to run the server on
     """
-    app.run(host='0.0.0.0', port=port, debug=config.debug, use_reloader=False)
+    app.run(host='0.0.0.0', port=port, debug=config.DEBUG, use_reloader=False)
 
 class EnhancedWorkflowTest:
     def __init__(self, test_mode=False):
@@ -87,7 +87,7 @@ class EnhancedWorkflowTest:
         self.logger.info("Enhanced workflow tester initialized with Advanced Tone Adaptation support")
         
         # Initialize advanced tone analysis components
-        self.tone_mapper = NeuralToneMapper(debug=config.debug)
+        self.tone_mapper = NeuralToneMapper(debug=config.DEBUG)
         self.tone_crawler = ToneCrawler()
         self.universal_crawler = UniversalCrawler()
         
@@ -362,9 +362,9 @@ class EnhancedWorkflowTest:
 
 # Initialize Flask app
 app = Flask(__name__, 
-            template_folder=config.get('template_folder', 'templates'),
-            static_folder=config.get('static_folder', 'static'))
-app.secret_key = config.secret_key
+            template_folder='templates',
+            static_folder='static')
+app.secret_key = config.SECRET_KEY
 
 # Register blueprints
 try:
@@ -381,6 +381,7 @@ class WorkflowData:
     def __init__(self):
         self.data_sources = []
         self.tone_sources = []
+        self.writing_style = {}  # Store writing style analysis data
         self.content_strategy = {}
         self.tone_analysis = {}
         self.crawled_data = {}
@@ -388,8 +389,13 @@ class WorkflowData:
         self.current_step = 1
         self.is_v2_workflow = False
         self.topic_relevance_data = {}  # Store topic relevance information for v2 workflow
+    
+    def reset(self):
+        """Reset the workflow data to initial state"""
+        self.__init__()
 
 workflow = WorkflowData()
+logger.info(f"Global workflow initialized with ID: {id(workflow)}")
 
 # Routes for each step of the workflow
 @app.route('/')
@@ -420,52 +426,34 @@ def test_page():
 def onboarding():
     """Start of the workflow - Redirect to first step"""
     global workflow
-    workflow = WorkflowData()
+    workflow.reset()  # Reset existing workflow instead of creating new one
+    logger.info(f"Workflow reset - Workflow object ID: {id(workflow)}")
+    logger.info(f"Workflow reset - Initial data_sources: {workflow.data_sources}")
     return redirect('/onboarding/step1')
 
-@app.route('/onboarding/step1', methods=['GET', 'POST'])
-def step1_data_sources():
-    """Step 1: Data Sources"""
-    if request.method == 'POST':
-        # Process and store sources
-        sources = request.json.get('sources', [])
-        workflow.data_sources = sources
-    
-    workflow.current_step = 1
-    return render_template('onboarding/step1_data_sources.html', step=1, sources=workflow.data_sources)
+# REMOVED: Duplicate route - using onboarding_bp instead
+# @app.route('/onboarding/step1', methods=['GET', 'POST'])
+# def step1_data_sources():
+#     """Step 1: Data Sources - REMOVED: Using onboarding_bp instead"""
+#     pass
 
-@app.route('/onboarding/step2', methods=['GET', 'POST'])
-def writing_style():
-    """Step 2: Writing Style Analysis"""
-    if request.method == 'POST':
-        # Process writing style inputs
-        tone_sources = request.json.get('tone_sources', [])
-        workflow.tone_sources = tone_sources
-    
-    workflow.current_step = 2
-    return render_template('onboarding/step2_writing_style.html', step=2, tone_sources=workflow.tone_sources)
+# REMOVED: Duplicate route - using onboarding_bp instead
+# @app.route('/onboarding/step2', methods=['GET', 'POST'])
+# def writing_style():
+#     """Step 2: Writing Style Analysis - REMOVED: Using onboarding_bp instead"""
+#     pass
 
-@app.route('/onboarding/step3', methods=['GET', 'POST'])
-def content_strategy():
-    """Step 3: Content Strategy"""
-    if request.method == 'POST':
-        # Process content strategy inputs
-        strategy = request.json.get('content_strategy', {})
-        workflow.content_strategy = strategy
-    
-    workflow.current_step = 3
-    return render_template('onboarding/step3_content_strategy.html', step=3, strategy=workflow.content_strategy)
+# REMOVED: Duplicate route - using onboarding_bp instead
+# @app.route('/onboarding/step3', methods=['GET', 'POST'])
+# def content_strategy():
+#     """Step 3: Content Strategy - REMOVED: Using onboarding_bp instead"""
+#     pass
 
-@app.route('/onboarding/step4', methods=['GET', 'POST'])
-def article_generation():
-    """Step 4: Article Generation"""
-    if request.method == 'POST':
-        # Process article generation inputs
-        article_params = request.json.get('article_params', {})
-        workflow.generated_article = article_params
-    
-    workflow.current_step = 4
-    return render_template('onboarding/step4_article_generation.html', step=4, article=workflow.generated_article)
+# REMOVED: Duplicate route - using onboarding_bp instead
+# @app.route('/onboarding/step4', methods=['GET', 'POST'])
+# def article_generation():
+#     """Step 4: Article Generation - REMOVED: Using onboarding_bp instead"""
+#     pass
 
 @app.route('/add-source', methods=['POST'])
 def add_source():
@@ -473,13 +461,21 @@ def add_source():
     source_url = request.form.get('source_url', '')
     source_type = request.form.get('source_type', 'article')
     
+    logger.info(f"Adding source: {source_url} ({source_type})")
+    logger.info(f"Current workflow data_sources: {workflow.data_sources}")
+    
     if source_url:
+        # Ensure data_sources is a list
+        if not hasattr(workflow, 'data_sources') or workflow.data_sources is None:
+            workflow.data_sources = []
+        
         workflow.data_sources.append({
             'url': source_url,
             'type': source_type,
             'added': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
         logger.info(f"Added source: {source_url} ({source_type})")
+        logger.info(f"Updated workflow data_sources: {workflow.data_sources}")
     
     return jsonify({
         'status': 'success',
@@ -563,14 +559,56 @@ def analyze_content():
         logger.info("Initializing NeuralToneMapper")
         mapper = NeuralToneMapper()
         
-        # Analyze the text
+        # Analyze the text - use analyze_tone method with content as a list
         logger.info("Analyzing text with NeuralToneMapper")
-        raw_analysis = mapper.analyze_text(content)
+        raw_analysis = mapper.analyze_tone([content])
         logger.info(f"Raw analysis obtained: {list(raw_analysis.keys())}")
         
-        # Format the analysis for display
-        formatted_analysis = mapper.format_analysis_for_display(raw_analysis)
-        logger.info("Analysis formatted for display")
+        # Format the analysis for display if the method exists
+        try:
+            if hasattr(mapper, 'format_analysis_for_display'):
+                formatted_analysis = mapper.format_analysis_for_display(raw_analysis)
+                logger.info("Analysis formatted for display")
+            else:
+                # Create a simple formatted version if the method doesn't exist
+                # Extract topics from domain_characteristics and key_phrases
+                detected_domains = list(raw_analysis.get('domain_characteristics', {}).keys())
+                key_phrases = raw_analysis.get('key_phrases', [])
+                
+                # Use detected domains as topics, fallback to key phrases if no domains
+                topics = detected_domains if detected_domains else [phrase[:20] for phrase in key_phrases[:3]]
+                
+                formatted_analysis = {
+                    'tone': 'Professional',
+                    'topics': topics,
+                    'complexity': 'Intermediate',
+                    'writing_style': 'Professional',
+                    'thought_patterns': raw_analysis.get('thought_patterns', {}),
+                    'reasoning_styles': raw_analysis.get('reasoning_styles', {}),
+                    'domain_characteristics': raw_analysis.get('domain_characteristics', {}),
+                    'overall_tone_score': raw_analysis.get('overall_tone_score', 0.5)
+                }
+                logger.info("Analysis formatted manually")
+        except Exception as format_error:
+            logger.warning(f"Error formatting analysis: {format_error}")
+            # Fallback to simple formatting
+            # Extract topics from domain_characteristics and key_phrases
+            detected_domains = list(raw_analysis.get('domain_characteristics', {}).keys())
+            key_phrases = raw_analysis.get('key_phrases', [])
+            
+            # Use detected domains as topics, fallback to key phrases if no domains
+            topics = detected_domains if detected_domains else [phrase[:20] for phrase in key_phrases[:3]]
+            
+            formatted_analysis = {
+                'tone': 'Professional',
+                'topics': topics,
+                'complexity': 'Intermediate',
+                'writing_style': 'Professional',
+                'thought_patterns': raw_analysis.get('thought_patterns', {}),
+                'reasoning_styles': raw_analysis.get('reasoning_styles', {}),
+                'domain_characteristics': raw_analysis.get('domain_characteristics', {}),
+                'overall_tone_score': raw_analysis.get('overall_tone_score', 0.5)
+            }
         
         # Store in workflow data
         workflow.tone_analysis = formatted_analysis
@@ -762,65 +800,11 @@ def crawl_and_analyze():
             }
         })
 
-@app.route('/generate-article', methods=['POST'])
-def generate_article():
-    """
-    Step 4 (c): Combines all collected data from previous steps to create a 4000-word article
-    - Takes URLs and data from step 1 (via QuantumUniversalCrawler extraction in step 4a)
-    - Takes tone analysis from step 2 
-    - Uses topics and content strategy from step 3
-    """
-    if request.method == 'POST':
-        try:
-            # Get the article generator based on settings
-            generator_type = request.form.get('generator_type', 'auto')
-            article_generator = get_article_generator(generator_type=generator_type)
-            
-            # Generate the article
-            topic = workflow.content_strategy.get('content_focus', 'General technology')
-            style_profile = workflow.tone_analysis
-            source_material = [
-                {"content": entry, "relevance": 0.95} 
-                for entry in workflow.crawled_data.get('sections', [])
-            ]
-            
-            generated_article = article_generator.generate_article(
-                topic=topic,
-                style_profile=style_profile,
-                source_material=source_material
-            )
-            
-            workflow.generated_article = generated_article
-            
-            # Save to session
-            session['article'] = generated_article
-            session['workflow'] = workflow.__dict__
-            
-            return jsonify({
-                'success': True,
-                'message': 'Article generated successfully',
-                'article': generated_article
-            })
-            
-        except Exception as e:
-            logger.error(f"Error generating article: {str(e)}")
-            return jsonify({
-                'success': False,
-                'message': f"Error generating article: {str(e)}"
-            }), 500
-    else:
-        return redirect(url_for('generate_content'))
+# Route moved to onboarding blueprint to avoid conflicts
+# @app.route('/generate-article', methods=['POST']) - Now handled by onboarding_bp
 
-@app.route('/article-preview')
-def article_preview():
-    """Preview the generated article"""
-    if not workflow.generated_article:
-        logger.error("No generated article found in workflow")
-        return redirect('/onboarding/step4')
-    
-    # Pass article data directly to the template instead of relying on session storage
-    logger.info("Rendering article preview page with article data")
-    return render_template('article_preview.html', article_data=workflow.generated_article.get('article', {}))
+# Route moved to onboarding blueprint to avoid conflicts
+# @app.route('/article-preview') - Now handled by onboarding_bp
 
 # V2 Workflow Endpoints
 
@@ -829,7 +813,7 @@ def start_v2():
     """Start of the reorganized workflow - Step 1: Content Strategy"""
     # Reset workflow data when starting from scratch
     global workflow
-    workflow = WorkflowData()
+    workflow.reset()  # Use reset instead of creating new instance
     workflow.is_v2_workflow = True
     workflow.current_step = 1
     logger.info("Starting V2 workflow (reorganized order)")
@@ -861,7 +845,7 @@ def data_sources_v2():
 def writing_style_v2():
     """Step 3 (V2): Writing Style Analysis"""
     workflow.current_step = 3
-    return render_template('onboarding/step2_writing_style_analysis.html', step=3, total_steps=4, is_v2=True)
+    return render_template('onboarding/step2_writing_style.html', step=3, total_steps=4, is_v2=True)
 
 @app.route('/v2/step4')
 def generate_content_v2():
@@ -1120,15 +1104,15 @@ def analyze_writing_style():
     try:
         data = request.get_json()
         
-        # Validate required fields
-        if 'text' not in data:
+        # Frontend sends 'input' field, not 'text'
+        if 'input' not in data:
             return jsonify({
                 'status': 'error',
-                'message': 'Missing required field: text'
+                'message': 'Missing required field: input'
             })
         
-        text = data.get('text', '')
-        source_type = data.get('source_type', 'direct_input')
+        text = data.get('input', '')  # Get from 'input' field
+        source_type = data.get('method', 'text')  # Frontend sends 'method' field
         
         if not text:
             return jsonify({
@@ -1136,13 +1120,16 @@ def analyze_writing_style():
                 'message': 'Text cannot be empty'
             })
         
-        # Initialize tone analyzer
-        if tone_mapper_available:
+        # Use NeuralToneMapper for writing style analysis (same as the working /analyze-content endpoint)
+        try:
             tone_analyzer = NeuralToneMapper()
             logger.info("Using NeuralToneMapper for writing style analysis")
-        else:
-            # Fallback to simulated analysis
-            logger.warning("NeuralToneMapper not available, using simulated analysis")
+            # NeuralToneMapper expects a list of text sources
+            analysis_result = tone_analyzer.analyze_tone([text])
+            tone_mapper_available = True
+        except Exception as e:
+            tone_mapper_available = False
+            logger.warning(f"NeuralToneMapper not available ({str(e)}), using simulated analysis")
             tone_analyzer = {
                 'analyze': lambda text: {
                     'voice_character': {
@@ -1165,9 +1152,7 @@ def analyze_writing_style():
                     }
                 }
             }
-        
-        # Analyze text
-        analysis_result = tone_analyzer.analyze(text) if tone_mapper_available else tone_analyzer['analyze'](text)
+            analysis_result = tone_analyzer['analyze'](text)
         
         # Store in workflow data
         workflow.tone_analysis = {
@@ -1184,11 +1169,59 @@ def analyze_writing_style():
         if workflow.is_v2_workflow and workflow.current_step == 3:
             workflow.current_step = 4
         
-        return jsonify({
-            'status': 'success',
-            'message': 'Writing style analyzed successfully',
-            'analysis': workflow.tone_analysis
-        })
+        # Debug: Log what we're checking
+        logger.info(f"Debug - tone_mapper_available: {tone_mapper_available}")
+        logger.info(f"Debug - analysis_result: {analysis_result}")
+        logger.info(f"Debug - analysis_result type: {type(analysis_result)}")
+        if analysis_result:
+            logger.info(f"Debug - analysis_result keys: {list(analysis_result.keys()) if isinstance(analysis_result, dict) else 'Not a dict'}")
+        
+        # Return response using actual analysis results from NeuralToneMapper
+        if tone_mapper_available and analysis_result:
+            # NeuralToneMapper returns: thought_patterns, reasoning_styles, domain_characteristics, key_phrases, linguistic_complexity, overall_tone_score
+            primary_thought_pattern = max(analysis_result.get('thought_patterns', {}).items(), key=lambda x: x[1])[0] if analysis_result.get('thought_patterns') else 'analytical'
+            primary_reasoning = max(analysis_result.get('reasoning_styles', {}).items(), key=lambda x: x[1])[0] if analysis_result.get('reasoning_styles') else 'logical'
+            
+            # Get complexity from linguistic_complexity
+            linguistic_complexity = analysis_result.get('linguistic_complexity', {})
+            avg_sentence_length = linguistic_complexity.get('avg_sentence_length', 15)
+            complexity_level = 'Advanced' if avg_sentence_length > 20 else 'Intermediate' if avg_sentence_length > 12 else 'Simple'
+            
+            # Calculate readability score
+            readability_score = min(10, max(1, int(20 - avg_sentence_length/2)))
+            
+            return jsonify({
+                'tone': f"{primary_thought_pattern.title()} and {primary_reasoning.title()}",
+                'communicationStyle': f"{primary_thought_pattern.title()} with {primary_reasoning} reasoning",
+                'readabilityScore': f"{readability_score}/10",
+                'complexityLevel': complexity_level,
+                'recommendations': [
+                    f"Your {primary_thought_pattern} thinking style is well-suited for this content",
+                    f"Consider using more {primary_reasoning} reasoning patterns",
+                    f"Your average sentence length of {avg_sentence_length:.1f} words is {complexity_level.lower()}",
+                    f"Key phrases detected: {', '.join(analysis_result.get('key_phrases', [])[:3])}",
+                    f"Overall tone score: {analysis_result.get('overall_tone_score', 0.5):.2f}"
+                ],
+                'input_method': source_type,
+                'analyzed_text': text[:100] + '...' if len(text) > 100 else text,
+                'raw_analysis': analysis_result  # Include the full analysis for debugging
+            })
+        else:
+            # Fallback to default values if analysis failed
+            return jsonify({
+                'tone': 'Professional and Informative',
+                'communicationStyle': 'Clear and Concise',
+                'readabilityScore': '8.5/10',
+                'complexityLevel': 'Intermediate',
+                'recommendations': [
+                    'Maintain your clear and professional tone',
+                    'Use industry-specific terminology sparingly',
+                    'Break complex ideas into digestible paragraphs'
+                ],
+                'input_method': source_type,
+                'analyzed_text': text[:100] + '...' if len(text) > 100 else text,
+                'note': 'Analysis failed, using default values'
+            })
         
     except Exception as e:
         logger.error(f"Error in analyze-writing-style: {str(e)}")

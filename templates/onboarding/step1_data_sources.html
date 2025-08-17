@@ -34,35 +34,95 @@
 }
 
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
   display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 9999 !important;
 }
 
 .modal {
-  background-color: var(--card-background);
-  padding: 30px;
-  border-radius: 10px;
-  width: 500px;
-  max-width: 90%;
+  background-color: var(--card-background) !important;
+  padding: 30px !important;
+  border-radius: 10px !important;
+  width: 500px !important;
+  max-width: 90% !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  position: relative !important;
+  z-index: 10000 !important;
+  transform: translateZ(0) !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-.modal h3 {
+.modal h2 {
   margin-top: 0;
   color: var(--accent-color);
+  margin-bottom: 20px;
 }
 
-.modal-buttons {
+.modal p {
+  margin-bottom: 20px;
+  color: var(--text-color);
+}
+
+.modal input[type="url"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #333;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  color: var(--text-color);
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.modal input[type="url"]:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(196, 164, 132, 0.2);
+}
+
+.modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  gap: 15px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.modal-actions button:first-child {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.modal-actions button:first-child:hover {
+  background-color: #a68b72;
+}
+
+.modal-actions button:last-child {
+  background-color: var(--button-background);
+  color: var(--text-color);
+}
+
+.modal-actions button:last-child:hover {
+  background-color: var(--button-hover);
 }
 
 .source-count {
@@ -145,6 +205,7 @@
     border-radius: 3px;
     padding: 8px 16px;
     cursor: pointer;
+    margin-bottom: 20px;
 }
 
 .add-source-button:hover {
@@ -189,6 +250,17 @@
 .error {
     background-color: var(--error-color);
     color: white;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 15px;
+}
+
+.button-row button {
+    flex: 1;
 }
 </style>
 {% endblock %}
@@ -272,11 +344,22 @@ function updateSourceCount() {
 }
 
 function showAddSourceModal() {
-    document.getElementById('addSourceModal').style.display = 'block';
+    const modal = document.getElementById('addSourceModal');
+    const modalContent = modal.querySelector('.modal');
+    
+    modal.style.display = 'flex';
+    modalContent.style.display = 'block';
+    
+    // Force modal to be visible
+    modalContent.style.visibility = 'visible';
+    modalContent.style.opacity = '1';
+    
+    document.getElementById('sourceUrl').focus();
 }
 
 function closeAddSourceModal() {
-    document.getElementById('addSourceModal').style.display = 'none';
+    const modal = document.getElementById('addSourceModal');
+    modal.style.display = 'none';
     document.getElementById('sourceUrl').value = '';
 }
 
@@ -344,35 +427,56 @@ function analyzeContent(url) {
         </div>
     `;
 
-    // Simulate content analysis (replace with actual backend call)
-    fetch('/analyze-source', {
+    // Call the correct analyze-content endpoint
+    const formData = new FormData();
+    formData.append('type', 'url');
+    formData.append('content', url);
+
+    console.log('Sending analysis request for:', url);
+    console.log('Form data:', formData);
+
+    fetch('/analyze-content', {
         method: 'POST',
-        body: JSON.stringify({ url: url }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('Analysis response data:', data);
+        
+        if (data.status === 'error') {
+            throw new Error(data.message);
+        }
+        
         analysisContainer.innerHTML = `
             <div class="content-summary">
                 <h3>Content Analysis</h3>
                 <p>Analysis for: ${url}</p>
                 <div class="analysis-result">
-                    <p><strong>Tone:</strong> ${data.tone || 'Professional'}</p>
+                    <p><strong>Tone:</strong> ${data.tone || data.overall_tone || 'Professional'}</p>
                     <p><strong>Key Topics:</strong> ${data.topics ? data.topics.join(', ') : 'Technology, Business'}</p>
                     <p><strong>Complexity:</strong> ${data.complexity || 'Intermediate'}</p>
+                    <p><strong>Writing Style:</strong> ${data.writing_style || 'Professional'}</p>
                 </div>
             </div>
         `;
     })
     .catch(error => {
+        console.error('Analysis error:', error);
         analysisContainer.innerHTML = `
             <div class="content-summary error">
                 <h3>Content Analysis Error</h3>
                 <p>Unable to analyze source: ${url}</p>
                 <div class="analysis-result">
                     <p>Error: ${error.message}</p>
+                    <p>Check the browser console for more details.</p>
                 </div>
             </div>
         `;
@@ -381,6 +485,8 @@ function analyzeContent(url) {
 
 function nextStep() {
     if (sources.length >= minSources) {
+        console.log('Submitting sources:', sources);
+        
         fetch('/onboarding/step1', {
             method: 'POST',
             body: JSON.stringify({ sources: sources }),
@@ -389,10 +495,19 @@ function nextStep() {
             }
         })
         .then(response => {
-            if (response.ok) {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.status === 'success') {
+                console.log('Sources saved successfully, redirecting to step 2');
                 window.location.href = '/onboarding/step2';
             } else {
-                alert('Error saving sources. Please try again.');
+                alert('Error saving sources: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
@@ -411,6 +526,20 @@ function previousStep() {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     updateSourceCount();
+    
+    // Close modal when clicking outside
+    document.getElementById('addSourceModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAddSourceModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAddSourceModal();
+        }
+    });
 });
 </script>
 {% endblock %}
