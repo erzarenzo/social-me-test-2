@@ -229,10 +229,12 @@ function updateWordCount(textareaId, counterId) {
         counter.style.color = '#666';
     }
     
-    validateForm();
+    // Don't call validateForm here to avoid interference with button state
 }
 
 function selectFrequency(frequency) {
+    console.log('selectFrequency called with:', frequency);
+    
     // Remove selected class from all options
     document.querySelectorAll('.frequency-option').forEach(option => {
         option.classList.remove('selected');
@@ -240,9 +242,15 @@ function selectFrequency(frequency) {
     
     // Add selected class to clicked option
     const selectedOption = document.querySelector(`.frequency-option[data-frequency="${frequency}"]`);
-    selectedOption.classList.add('selected');
+    if (selectedOption) {
+        selectedOption.classList.add('selected');
+        console.log('Frequency option selected:', frequency);
+    } else {
+        console.error('Frequency option not found:', frequency);
+    }
     
     contentStrategy.publicationFrequency = frequency;
+    console.log('Updated contentStrategy.publicationFrequency:', contentStrategy.publicationFrequency);
     validateForm();
 }
 
@@ -252,10 +260,18 @@ function validateForm() {
     const contentGoals = document.getElementById('contentGoals').value.trim();
     const frequencySelected = contentStrategy.publicationFrequency !== null;
     
+    console.log('Form validation:', {
+        primaryTopic: primaryTopic,
+        secondaryTopics: secondaryTopics,
+        contentGoals: contentGoals,
+        frequencySelected: frequencySelected
+    });
+    
     const nextBtn = document.getElementById('nextBtn');
     
     if (primaryTopic && secondaryTopics && contentGoals && frequencySelected) {
         nextBtn.disabled = false;
+        console.log('Form is valid - Next button enabled');
         
         // Update content strategy object
         contentStrategy.primaryTopic = primaryTopic;
@@ -263,6 +279,7 @@ function validateForm() {
         contentStrategy.contentGoals = contentGoals;
     } else {
         nextBtn.disabled = true;
+        console.log('Form is invalid - Next button disabled');
     }
 }
 
@@ -309,26 +326,46 @@ function loadSampleStrategy(type) {
 }
 
 function nextStep() {
-    if (validateForm()) {
-        fetch('/onboarding/step3', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(contentStrategy)
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.href = '/onboarding/step4';
-            } else {
-                alert('Error saving content strategy. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
+    console.log('nextStep() called');
+    console.log('contentStrategy object:', contentStrategy);
+    
+    // Check if the button is enabled (which means validation passed)
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn.disabled) {
+        console.log('Next button is disabled - form validation failed');
+        alert('Please complete all required fields before continuing.');
+        return;
     }
+    
+    // Ensure contentStrategy is up to date with current form values
+    contentStrategy.primaryTopic = document.getElementById('primaryTopic').value.trim();
+    contentStrategy.secondaryTopics = document.getElementById('secondaryTopics').value.trim();
+    contentStrategy.contentGoals = document.getElementById('contentGoals').value.trim();
+    
+    console.log('Form validation passed, making POST request to /onboarding/step3');
+    console.log('Final contentStrategy to send:', contentStrategy);
+    
+    fetch('/onboarding/step3', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contentStrategy)
+    })
+    .then(response => {
+        console.log('Response received:', response);
+        if (response.ok) {
+            console.log('Success! Redirecting to step 4');
+            window.location.href = '/onboarding/step4';
+        } else {
+            console.error('Error response:', response);
+            alert('Error saving content strategy. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('An error occurred. Please try again.');
+    });
 }
 
 function previousStep() {
@@ -339,13 +376,17 @@ function previousStep() {
 document.getElementById('primaryTopic').addEventListener('input', validateForm);
 document.getElementById('secondaryTopics').addEventListener('input', () => {
     updateWordCount('secondaryTopics', 'secondaryTopicsCount');
+    validateForm(); // Validate after word count update
 });
 document.getElementById('contentGoals').addEventListener('input', () => {
     updateWordCount('contentGoals', 'contentGoalsCount');
+    validateForm(); // Validate after word count update
 });
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing form validation');
+    console.log('Initial contentStrategy:', contentStrategy);
     validateForm();
 });
 </script>

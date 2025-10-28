@@ -7,3 +7,7 @@ sqlalchemy
 spacy
 scikit-learn
 anthropic
+networkx
+beautifulsoup4
+lxml
+numpy

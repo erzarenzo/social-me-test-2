@@ -25,6 +25,7 @@ class WorkflowData:
         """Initialize workflow data with empty collections"""
         self.data_sources = []
         self.tone_sources = []
+        self.writing_style = {}  # Store writing style analysis data
         self.content_strategy = {}
         self.tone_analysis = {}
         self.crawled_data = {}
@@ -42,6 +43,7 @@ class WorkflowData:
         return {
             'data_sources': self.data_sources,
             'tone_sources': self.tone_sources,
+            'writing_style': self.writing_style,
             'content_strategy': self.content_strategy,
             'tone_analysis': self.tone_analysis,
             'crawled_data': self.crawled_data,
@@ -57,6 +59,7 @@ class WorkflowData:
         workflow = cls()
         workflow.data_sources = data_dict.get('data_sources', [])
         workflow.tone_sources = data_dict.get('tone_sources', [])
+        workflow.writing_style = data_dict.get('writing_style', {})
         workflow.content_strategy = data_dict.get('content_strategy', {})
         workflow.tone_analysis = data_dict.get('tone_analysis', {})
         workflow.crawled_data = data_dict.get('crawled_data', {})

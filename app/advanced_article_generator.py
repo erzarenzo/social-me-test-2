@@ -44,9 +44,9 @@ try:
 except ImportError:
     logger.warning("python-dotenv not available, using environment variables directly.")
 
-CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+CLAUDE_API_KEY = os.getenv("ANTHROPIC_API_KEY") or os.getenv("CLAUDE_API_KEY")
 if not CLAUDE_API_KEY:
-    logger.warning("CLAUDE_API_KEY not found in environment variables.")
+    logger.warning("ANTHROPIC_API_KEY not found in environment variables.")
 
 class FallbackNLPProcessor:
     """
@@ -204,18 +204,8 @@ class ArticleGenerator:
         # Use provided API key or read directly from .env file
         if not api_key:
             try:
-                # Try to read directly from .env file to ensure we have the latest key
-                with open('/root/socialme/social-me-test-2/.env', 'r') as f:
-                    env_lines = f.readlines()
-                    
-                for line in env_lines:
-                    if line.startswith('CLAUDE_API_KEY='):
-                        api_key = line.strip().split('=', 1)[1]
-                        break
-                        
-                if not api_key:
-                    self.logger.warning("No Claude API key found in .env file")
-                    api_key = CLAUDE_API_KEY  # Fall back to environment variable
+                # Use environment variable directly
+                api_key = CLAUDE_API_KEY
             except Exception as e:
                 self.logger.error(f"Error reading .env file: {e}")
                 api_key = CLAUDE_API_KEY  # Fall back to environment variable
@@ -245,6 +235,16 @@ class ArticleGenerator:
             Dict containing the complete structured article
         """
         try:
+            # Log all input parameters for debugging
+            self.logger.info("=== ARTICLE GENERATION INPUT PARAMETERS ===")
+            self.logger.info(f"Topic: '{topic}' (type: {type(topic)})")
+            self.logger.info(f"Style profile: {style_profile}")
+            self.logger.info(f"Source material count: {len(source_material) if source_material else 0}")
+            if source_material:
+                for i, source in enumerate(source_material[:3]):  # Log first 3 sources
+                    self.logger.info(f"Source {i+1}: {source}")
+            self.logger.info("=== END INPUT PARAMETERS ===")
+            
             if not self.client:
                 self.logger.error("Claude client not initialized. Check your API key.")
                 return {
@@ -406,9 +406,19 @@ class ArticleGenerator:
             ["Heading 1: Specific Aspect", "Heading 2: Another Specific Aspect", ...]
             """
             
+            # Log the complete prompt being sent to Claude
+            self.logger.info("=== CLAUDE THEME EXTRACTION PROMPT ===")
+            self.logger.info(f"Topic: {topic}")
+            self.logger.info(f"System prompt: You are an expert content strategist who identifies key themes in source materials to create article outlines.")
+            self.logger.info(f"User prompt: {prompt}")
+            self.logger.info(f"Model: claude-3-7-sonnet-20250219")
+            self.logger.info(f"Max tokens: 1024")
+            self.logger.info(f"Temperature: 0.7")
+            self.logger.info("=== END PROMPT ===")
+            
             try:
                 response = self.client.messages.create(
-                    model="claude-3-sonnet-20240229",  # Fallback to sonnet if opus not available
+                    model="claude-3-7-sonnet-20250219",  # Most recent Claude 3.7 Sonnet model
                     max_tokens=1024,
                     temperature=0.7,
                     system="You are an expert content strategist who identifies key themes in source materials to create article outlines.",
@@ -533,9 +543,19 @@ class ArticleGenerator:
         }}
         """
         
+        # Log the complete prompt being sent to Claude
+        self.logger.info("=== CLAUDE ARTICLE OUTLINE PROMPT ===")
+        self.logger.info(f"Topic: {topic}")
+        self.logger.info(f"System prompt: {system_prompt}")
+        self.logger.info(f"User prompt: {user_prompt}")
+        self.logger.info(f"Model: claude-3-7-sonnet-20250219")
+        self.logger.info(f"Max tokens: 1000")
+        self.logger.info(f"Temperature: 0.7")
+        self.logger.info("=== END PROMPT ===")
+        
         try:
             response = self.client.messages.create(
-                model="claude-3-sonnet-20240229",
+                model="claude-3-7-sonnet-20250219",
                 max_tokens=1000,
                 temperature=0.7,
                 system=system_prompt,
@@ -585,9 +605,20 @@ class ArticleGenerator:
         Return only the section content as plain text, without the heading.
         """
         
+        # Log the complete prompt being sent to Claude
+        self.logger.info("=== CLAUDE ARTICLE SECTION PROMPT ===")
+        self.logger.info(f"Topic: {topic}")
+        self.logger.info(f"Section heading: {section_heading}")
+        self.logger.info(f"System prompt: {system_prompt}")
+        self.logger.info(f"User prompt: {user_prompt}")
+        self.logger.info(f"Model: claude-3-7-sonnet-20250219")
+        self.logger.info(f"Max tokens: 1500")
+        self.logger.info(f"Temperature: 0.7")
+        self.logger.info("=== END PROMPT ===")
+        
         try:
             response = self.client.messages.create(
-                model="claude-3-sonnet-20240229",
+                model="claude-3-7-sonnet-20250219",
                 max_tokens=1500,
                 temperature=0.7,
                 system=system_prompt,
@@ -622,9 +653,19 @@ class ArticleGenerator:
         Return only the conclusion text.
         """
         
+        # Log the complete prompt being sent to Claude
+        self.logger.info("=== CLAUDE ARTICLE CONCLUSION PROMPT ===")
+        self.logger.info(f"Topic: {topic}")
+        self.logger.info(f"System prompt: {system_prompt}")
+        self.logger.info(f"User prompt: {user_prompt}")
+        self.logger.info(f"Model: claude-3-7-sonnet-20250219")
+        self.logger.info(f"Max tokens: 800")
+        self.logger.info(f"Temperature: 0.7")
+        self.logger.info("=== END PROMPT ===")
+        
         try:
             response = self.client.messages.create(
-                model="claude-3-sonnet-20240229",
+                model="claude-3-7-sonnet-20250219",
                 max_tokens=800,
                 temperature=0.7,
                 system=system_prompt,

@@ -62,13 +62,17 @@ class ToneCrawler(BaseCrawler):
                 content = source
             
             # Perform quantum tone analysis
-            tone_analysis = self.quantum_crawler.analyze_tone(content)
+            logger.info(f"ToneCrawler: About to call analyze_text_tone with content length: {len(content)}")
+            tone_analysis = self.quantum_crawler.analyze_text_tone(content)
+            logger.info(f"ToneCrawler: analyze_text_tone returned: {tone_analysis}")
             
-            return {
+            result = {
                 "source": source,
                 "tone_analysis": tone_analysis,
                 "content": content
             }
+            logger.info(f"ToneCrawler: Returning result: {result}")
+            return result
         except Exception as e:
             logger.error(f"Error analyzing source {source}: {e}")
             return {
